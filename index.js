@@ -9,24 +9,34 @@ const AnyProxy      = require('anyproxy');
 const rocky         = require('rocky');
 const getPort       = require('get-port');
 const url           = require('url');
-
-var debug           = require('debug')('tunneler');
+const Promise       = require('bluebird');
+const express       = require('express');
+const Debug         = require('debug');
+var debug           = getDebugger('main');
 
 module.exports = start;
 
-function start(config){
-    debug('Starting...');
+var freePorts;
 
+function start(config){
+    var debug = getDebugger('start');
+    debug('Starting...');
 
     config.routes = config.routes || [];
 
-    var P = Promise.resolve(config.port);
-    if(config.webPort)
-        P = startWebClient(config.port, config.webPort);
+    Promise.all([getPort(), getPort()])
+    .then((_freePorts)=>{
+        freePorts = _freePorts;
 
-    P.then((proxyPort)=>{
-        debug("Proxy 2 port", proxyPort)
-        startProxy(config.routes, proxyPort);
+        if(config.port)
+            return config.port;
+
+        else freePorts.pop();
+    })
+    .then((proxyPort)=>{
+        var endPort = freePorts.pop();
+        startWebClient(proxyPort, config.webPort, endPort);
+        startProxy(config.routes, endPort);
     })
 
     clearRemotePort(config.remote)
@@ -36,10 +46,14 @@ function start(config){
 }
 
 function startProxy(routes, port){
+    var debug = getDebugger('proxy');
     debug('Starting proxy...');
 
     var Proxy = rocky();
-    Proxy.listen(port);
+
+    var app = express();
+    app.listen(port);
+    app.use(Proxy.middleware());
 
     routes = routes.map((route)=>{
         var src = true;
@@ -54,83 +68,92 @@ function startProxy(routes, port){
 
         if(!dest) return false;
 
-        return [src, dest]
+        return [src, dest];
     });
 
     var proxy = Proxy.all('/*');
 
     proxy
     .use((req, res, next)=>{
+        var url = fullURL(req);
+        debug(req.method, url);
+
+        if(!routes.length)
+            return res.send({status: true})
+
         var isMatch = false;
-        for(var i = 0; i < routes.length; i++){
-            var route = routes[0];
-            if(!route) continue;
+
+        routes.forEach((route)=>{
+            if(!route) return;
+
             req.rocky.options.replays = [];
 
-            if(route[0] === true || fullURL(req).startsWith(route[0])){
-                if(!req.doReplay)
+            if(route[0] === true || url.startsWith(route[0])){
+                if(!isMatch)
                     req.rocky.options.target = route[1];
                 else
                     req.rocky.options.replays.push(route[1]);
 
-                req.doReplay = true;
                 isMatch = true;
             }
-        }
+        });
 
-        next(!isMatch);
+        if(isMatch)
+            return next();
+
+        res.status(404).send({status: false});
     })
 }
 
 
-function startWebClient(proxyPort, webPort){
+function startWebClient(proxyPort, webPort, endPort){
+    var debug = getDebugger('web');
     debug('Starting web client');
 
-    return getPort()
-    .then((proxy2Port)=>{
-        var options = {
-            port        : proxyPort,
-            // rule    : require('myRuleModule'),
-            webInterface: {
-                enable      : true,
-                webPort     : webPort
-            },
-            rule            : getRule(),
-        };
+    // create temp port for
+    var options = {
+        port        : proxyPort,
+        webInterface: {
+            enable      : true,
+            webPort     : webPort
+        },
+        rule        : getRule(),
+        silent      : true
+    };
 
-        var webserver = new AnyProxy.ProxyServer(options);
+    var webserver = new AnyProxy.ProxyServer(options);
 
-        webserver.on('ready', () => {
-            debug("Web client started");
-        });
-        webserver.on('error', (e) => {
-            debug("Web client error");
-        });
+    webserver.on('ready', () => {
+        debug("Web client started");
+    });
+    webserver.on('error', (e) => {
+        debug("Web client error");
+    });
 
-        webserver.start();
+    webserver.start();
 
-        function getRule(){
-            return {
-                summary             : 'The one',
-                *beforeSendRequest(requestDetail){
-                    var newOption = Object.assign({}, requestDetail.requestOptions);
-                    newOption.hostname = 'localhost';
-                    newOption.port = proxy2Port;
-                    return {
-                        requestOptions: newOption
-                    };
-                }
+    function getRule(){
+        return {
+            summary             : 'The one',
+            *beforeSendRequest(requestDetail){
+                var newOption = Object.assign({}, requestDetail.requestOptions);
+                newOption.hostname = 'localhost';
+                newOption.port = endPort;
+                return {
+                    requestOptions: newOption
+                };
             }
         }
+    }
 
-        return proxy2Port;
-    })
 
 
 }
 
 function clearRemotePort(remote){
     return new Promise((resolve, reject)=>{
+        var debug = getDebugger('cleaner');
+
         debug("Cleaning remote port...");
 
         // first kill any existing services listening on port
@@ -170,6 +193,7 @@ function clearRemotePort(remote){
 }
 
 function startTunnel(localPort, remote){
+    var debug = getDebugger('tunnel');
     debug("Starting tunnel...");
 
     var conn = tunnel({
@@ -195,4 +219,12 @@ function fullURL(req) {
         host: req.headers.host,
         pathname: req.url
     });
+}
+
+function getDebugger(appendage){
+    var key = "tunneler";
+    var d = Debug([key, appendage].join(':'));
+    d.err = Debug([key, appendage, 'error'].join(':'));
+    d.error = Debug([key, appendage, 'error'].join(':'));
+    return d;
 }
