@@ -12,6 +12,7 @@ const url           = require('url');
 const Promise       = require('bluebird');
 const express       = require('express');
 const Debug         = require('debug');
+
 var debug           = getDebugger('main');
 
 module.exports = start;
@@ -39,15 +40,12 @@ function start(config){
         startProxy(config.routes, endPort);
     })
 
-    clearRemotePort(config.remote)
-    .then(()=>{
-        startTunnel(config.port, config.remote);
-    })
+    startTunnel(config);
 }
 
 function startProxy(routes, port){
     var debug = getDebugger('proxy');
-    debug('Starting proxy...');
+    debug('Starting proxy on port:', port);
 
     var Proxy = rocky();
 
@@ -73,8 +71,7 @@ function startProxy(routes, port){
 
     var proxy = Proxy.all('/*');
 
-    proxy
-    .use((req, res, next)=>{
+    proxy.use((req, res, next)=>{
         var url = fullURL(req);
         debug(req.method, url);
 
@@ -108,9 +105,8 @@ function startProxy(routes, port){
 
 function startWebClient(proxyPort, webPort, endPort){
     var debug = getDebugger('web');
-    debug('Starting web client');
+    debug('Starting web client on port:', webPort);
 
-    // create temp port for
     var options = {
         port        : proxyPort,
         webInterface: {
@@ -127,7 +123,7 @@ function startWebClient(proxyPort, webPort, endPort){
         debug("Web client started");
     });
     webserver.on('error', (e) => {
-        debug("Web client error");
+        debug.error("Web client error");
     });
 
     webserver.start();
@@ -145,9 +141,46 @@ function startWebClient(proxyPort, webPort, endPort){
             }
         }
     }
+}
 
+function startTunnel(config){
 
+    var localPort = config.port;
+    var remote = config.remote;
 
+    var debug = getDebugger('tunnel');
+    debug("Starting tunnel...");
+
+    var options = {
+        host        : remote.host,
+        username    : remote.username,
+        // dstHost     : '0.0.0.0', // bind to all IPv4 interfaces
+        dstPort     : remote.listenPort,
+        privateKey  : remote.privateKey,
+        //srcHost: '127.0.0.1', // default
+        srcPort     : localPort // default is the same as dstPort
+    };
+
+    var conn;
+
+    connect()
+    .then(()=>{
+        conn.on('error', (err) => {
+            debug.error("Tunnel error", err);
+            conn.end();
+            connect();
+        })
+    })
+
+    function connect(){
+        return clearRemotePort(remote)
+        .then(()=>{
+            conn = tunnel(options, (err, clientConnection) => {
+                if(err)
+                    debug.error(err);
+            });
+        })
+    }
 }
 
 function clearRemotePort(remote){
@@ -179,8 +212,9 @@ function clearRemotePort(remote){
             });
         });
 
+        // disconnect and reconnet
         conn.on('error', (err) => {
-            debug("SSH2 error", err);
+            debug.error("SSH2 error", err);
         })
 
         conn.connect({
@@ -189,28 +223,6 @@ function clearRemotePort(remote){
             port        : remote.port || 22,
             privateKey  : remote.privateKey,
         })
-    })
-}
-
-function startTunnel(localPort, remote){
-    var debug = getDebugger('tunnel');
-    debug("Starting tunnel...");
-
-    var conn = tunnel({
-        host        : remote.host,
-        username    : remote.username,
-        // dstHost     : '0.0.0.0', // bind to all IPv4 interfaces
-        dstPort     : remote.listenPort,
-        privateKey  : remote.privateKey,
-        //srcHost: '127.0.0.1', // default
-        srcPort     : localPort // default is the same as dstPort
-    }, (err, clientConnection) => {
-        if(err)
-            debug(err);
-    });
-
-    conn.on('error', (err) => {
-        debug("Tunnel error", err);
     })
 }
 

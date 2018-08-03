@@ -1,0 +1,14 @@
+html, body {
+  background-color: #efefef !important; }
+
+#app_wrapper {
+  background-color: #fff; }
+  #app_wrapper #request_list #request_list_header {
+    border: #ccc solid;
+    border-width: 0 0 1px;
+    padding: 3px 0;
+    font-weight: bold; }
+  #app_wrapper #request_list .request_list_row {
+    padding: 3px 0;
+    border: #ccc dotted;
+    border-width: 0 0 1px; }
