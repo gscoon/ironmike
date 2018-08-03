@@ -52,13 +52,11 @@ function clearRemotePort(remote){
     return new Promise((resolve, reject)=>{
         var debug = Util.getDebugger('cleaner');
 
-        debug("Cleaning remote port...");
-
         // first kill any existing services listening on port
         var conn = new ssh2.Client();
 
         var cmd = "kill $(lsof -t -i:" + remote.listenPort +")";
-        debug("Executing command", cmd);
+        // debug("Executing command", cmd);
 
         conn.on('ready', ()=>{
             conn.exec(cmd, (err, stream)=>{

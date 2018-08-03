@@ -5,6 +5,7 @@ const rocky         = require('rocky');
 const moment        = require('moment');
 const express       = require('express');
 const bodyParser    = require('body-parser');
+const _             = require('lodash');
 
 var debug = Util.getDebugger('proxy');
 
@@ -83,17 +84,15 @@ function processRequest(req){
     var rightNow = moment();
     var id = Util.genUID();
 
-    var entry = {
+    var entry = _.pick(req, ['headers', 'body', 'hostname', 'protocol', 'query', 'method'])
+
+    Object.assign(entry, {
         id              : id,
-        headers         : req.headers,
-        body            : req.body,
         url             : getFullURL(req, true),
-        protocol        : req.protocol,
-        method          : req.method,
-        query           : req.query,
+        path            : req.url,
         timestamp       : rightNow.format(),
         unixTimestamp   : rightNow.unix(),
-    };
+    });
 
     Handler.data.push('requests', entry);
 }

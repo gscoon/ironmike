@@ -22,7 +22,7 @@ module.exports = {
 
 function start(config){
     var debug = Util.getDebugger('start');
-    debug('Starting...');
+    debug('App: Starting...');
 
     config.routes = config.routes || [];
 

@@ -7,6 +7,8 @@ html, body
 {
     // font-size: 13px;
     background-color: #fff;
+    box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.5);
+    margin-top: 15px;
 
     #request_list
     {
@@ -15,15 +17,42 @@ html, body
         {
             border: #ccc solid;
             border-width: 0 0 1px;
-            padding: 3px 0;
+            padding: 7px 0;
+            margin-bottom: 10px;
+            font-weight: bold;
+            background-color: #333;
+            color: #efefef;
+        }
+
+        .request_list_subheader
+        {
+            font-size: 15px;
+            color: #444;
             font-weight: bold;
         }
 
         .request_list_row
         {
-            padding: 3px 0;
+            padding: 5px 0;
             border: #ccc dotted;
             border-width: 0 0 1px;
+            font-size: 14px;
+
+            .request_list_row_lower
+            {
+                background-color: #ccc;
+                min-height: 100px;
+                margin: 10px 0 0;
+                display: none;
+
+                .sub_container
+                {
+                    border: #999 solid;
+                    border-width: 0 0 1px;
+                    padding: 10px;
+                    margin-bottom: 10px;
+                }
+            }
         }
     }
 }

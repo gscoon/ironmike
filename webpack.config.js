@@ -13,7 +13,9 @@ module.exports = {
     output  : {
         path        : paths.public,
         publicPath  : '/',
-        filename    : 'bundle.js'
+        filename    : 'bundle.js',
+        sourceMapFilename: "./bundle.js.map",
+        devtoolLineToLine: true,
     },
     devServer: {
         contentBase: paths.public,
@@ -22,14 +24,15 @@ module.exports = {
     module: {
         rules: [
             {
-                test: /\.(js|jsx)$/,
-                exclude: /node_modules/,
-                loader: 'babel-loader',
+                test        : /\.(js|jsx)$/,
+                exclude     : /node_modules/,
+                include     :  paths.src,
+                loader      : 'babel-loader',
             },
             {
-                test: /\.scss/,
-                // include: paths.src,
-                loaders: ["style-loader", "css-loader?modules"]
+                test        : /\.scss/,
+                include     : paths.src,
+                loaders     : ["style-loader", "css-loader?modules"]
             }
         ]
     }
