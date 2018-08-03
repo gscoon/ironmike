@@ -1,29 +1,44 @@
+const Path          = require('path');
+const fs            = require('fs');
 const express       = require('express');
 const bodyParser    = require('body-parser');
 const url           = require('url');
+const socketIO      = require('socket.io');
+
+var debug = Util.getDebugger('api');
 
 module.exports = {
     start : start
 }
 
-function start(){
-    var app = express();
-    app.use(handleReqs);
-    return app;
+var app = express();
+
+function start(port){
+    var http = require('http').Server(app);
+    var io = socketIO(http);
+
+    http.listen(port, ()=>{
+        debug('API: listening to port', port);
+    })
+
+    // io.on('connection', function(socket){
+    //     debug('a user connected');
+    // });
 }
 
-function handleReqs(req, res, next){
-    var key = req.headers['x-iron-mike'];
-    if(!key)
-        return next();
+app.use(express.static(Path.join(Main.rootDir, 'public')))
+app.use(bodyParser.json());
 
-    bodyParser.json()(req, res, (err)=>{
-        if(err)
-            return next(err);
+app.get('/api/requests', getAllRequests);
+app.get('/api/requests/:id', getLatestRequests);
 
-        switch(key){
+app.all('*', (req, res)=>res.status(404).send({status: false, code: 404}));
 
-        }
-        res.send({status: true, data: req.body});
-    })
+function getAllRequests(req, res){
+    var requests = Handler.data.get('requests');
+    res.send({status: true, data: requests});
+}
+
+function getLatestRequests(req, res){
+    res.send({status: true, id: req.params.id})
 }

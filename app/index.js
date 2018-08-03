@@ -6,6 +6,11 @@ const moment        = require('moment');
 const getPort       = require('get-port');
 const Promise       = require('bluebird');
 
+global.Main = {
+    rootDir     : __dirname,
+}
+
+global.Config = require('./config.js');
 global.Util = require('./util.js');
 global.Handler = Util.getHandlers(Path.join(__dirname, 'handlers'));
 
@@ -21,9 +26,11 @@ function start(config){
 
     config.routes = config.routes || [];
 
-    var app = Handler.api.start()
     // find x free ports
-    Promise.all([getPort(), getPort(), getPort()])
+    Handler.data.start()
+    .then(()=>{
+        return Promise.all([getPort(), getPort(), getPort(), getPort()])
+    })
     .then((freePorts)=>{
         if(!config.port)
             config.port = freePorts.pop();
@@ -31,10 +38,15 @@ function start(config){
         if(!config.webPort)
             config.webPort = freePorts.pop();
 
+        if(!config.apiPort)
+            config.apiPort = freePorts.pop();
+
         var endPort = freePorts.pop();
+
 
         Handler.tunnel.start(config);
         Handler.web.start(config, endPort);
-        Handler.proxy.start(app, config.routes, endPort);
+        Handler.proxy.start(config.routes, endPort);
+        Handler.api.start(config.apiPort);
     })
 }
