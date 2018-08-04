@@ -2,9 +2,11 @@ const Path          = require('path');
 const fs            = require('fs');
 const express       = require('express');
 const bodyParser    = require('body-parser');
+const favicon       = require('serve-favicon');
 const url           = require('url');
 const socketIO      = require('socket.io');
 const _             = require('lodash');
+const opn           = require('opn');
 
 var debug = Util.getDebugger('api');
 
@@ -20,6 +22,7 @@ function start(port){
 
     http.listen(port, ()=>{
         debug('API: listening to port', port);
+        // opn('http://localhost:' + port);
     })
 
     // io.on('connection', function(socket){
@@ -27,8 +30,11 @@ function start(port){
     // });
 }
 
-app.use(express.static(Path.join(Main.rootDir, 'public')))
+var publicDir = Path.join(Main.rootDir, 'frontend/public/');
+
+app.use(express.static(publicDir))
 app.use(bodyParser.json());
+app.use(favicon(Path.join(publicDir, 'images/favicon/favicon-32x32.png')));
 
 app.get('/api/requests', getAllRequests);
 app.get('/api/requests/:id', getLatestRequests);

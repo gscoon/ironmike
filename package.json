@@ -1,14 +1,14 @@
 {
   "name": "ironmike",
-  "main": "app/index.js",
+  "main": "app/main.js",
   "scripts": {
     "start": "npm-run-all -p watch-css start-js",
     "start-js": "webpack-dev-server",
     "webpack:watch": "webpack -d --watch",
-    "build-css": "node-sass-chokidar app/frontend/sass/ -o app/public/css/",
-    "watch-css": "npm run build-css && node-sass-chokidar app/frontend/sass/ -o app/public/css/ --watch --recursive",
+    "build-css": "node-sass-chokidar app/frontend/styles/ -o app/frontend/public/css/",
+    "watch-css": "npm run build-css && node-sass-chokidar app/frontend/styles/ -o app/frontend/public/css/ --watch --recursive",
     "nodemon": "nodemon test.js",
-    "dev": "npm-run-all -p watch-css webpack:watch nodemon"
+    "dev": "npm-run-all -p webpack:watch nodemon"
   },
   "dependencies": {
     "anyproxy": "^4.0.10",
@@ -29,12 +29,16 @@
     "moment": "^2.22.2",
     "node-sass-chokidar": "^1.3.3",
     "npm-run-all": "^4.1.3",
+    "opn": "^5.3.0",
     "react-dom": "^16.4.2",
+    "react-toastify": "^4.1.0",
     "reflux": "^6.4.1",
     "reverse-tunnel-ssh": "^1.1.0",
     "rimraf": "^2.6.2",
     "rocky": "^0.4.15",
+    "semantic-ui-css": "^2.3.3",
     "semantic-ui-react": "^0.82.1",
+    "serve-favicon": "^2.5.0",
     "slugify": "^1.3.0",
     "socket.io": "^2.1.1",
     "socket.io-client": "^2.1.1",
@@ -48,6 +52,7 @@
     "babel-preset-es2015": "^6.24.1",
     "babel-preset-react": "^6.24.1",
     "css-loader": "^1.0.0",
+    "file-loader": "^1.1.11",
     "node-sass": "^4.9.2",
     "react": "^16.4.2",
     "sass-loader": "^7.1.0",

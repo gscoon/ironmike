@@ -3,6 +3,14 @@ import Reflux from 'reflux';
 import ReactDOM from 'react-dom';
 import swal from 'sweetalert2';
 
+import { ToastContainer, toast } from 'react-toastify';
+
+// Styling
+import 'react-toastify/dist/ReactToastify.css';
+import './styles/app.scss';
+import './styles/dependencies/grid12.css';
+import 'semantic-ui-css/semantic.min.css';
+
 Object.assign(window, {
     Actions     : require('./actions/'),
     AppStore    : require('./store/'),
@@ -10,6 +18,8 @@ Object.assign(window, {
     UI          : require('semantic-ui-react'),
     Modal       : getModal(),
     moment      : require('moment'),
+    Toast       : toast,
+    I           : require('immutable'),
 })
 
 var Dashboard = require('./components/dashboard.jsx');
@@ -18,19 +28,21 @@ class App extends Reflux.Component {
     constructor(props){
         super(props);
         this.store = AppStore;
+    }
 
-        Util.wait().then(Actions.dashboard.getRequests);
-
-        Util.waitasec(1)
-        .then(()=>{
-            setInterval(Actions.dashboard.getLatestRequest, 1000);
-        })
+    showLoader(){
+        return (
+            <UI.Dimmer active>
+                <Loader content="Loading" />
+            </UI.Dimmer>
+        )
     }
 
     render(){
         return (
             <div id="app_wrapper" className="container">
                 <Dashboard requests={this.state.app.get('requests')} />
+                <ToastContainer position="top-right" autoClose={3000} />
             </div>
         );
     }

@@ -2,8 +2,9 @@ const webpack   = require('webpack');
 const Path      = require('path');
 
 var paths = {
-    public  : Path.join(__dirname + '/app/public'),
     src     : Path.join(__dirname + '/app/frontend'),
+    public  : Path.join(__dirname + '/app/frontend/public'),
+    styles  : Path.join(__dirname + '/app/frontend/styles'),
 }
 
 module.exports = {
@@ -30,9 +31,16 @@ module.exports = {
                 loader      : 'babel-loader',
             },
             {
-                test        : /\.scss/,
-                include     : paths.src,
-                loaders     : ["style-loader", "css-loader?modules"]
+                test        : /\.(scss|css)$/,
+                // include     : paths.styles,
+                loaders     : ["style-loader", "css-loader", "sass-loader"]
+            },
+            {
+                test: /\.(eot|woff|ttf|woff2|png|gif|jpeg|jpg|svg)$/,
+                loader: "file-loader",
+                options: {
+                    outputPath: 'images/webpack/'
+                }
             }
         ]
     }

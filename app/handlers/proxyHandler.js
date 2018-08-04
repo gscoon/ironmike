@@ -13,7 +13,8 @@ module.exports = {
     start : startProxy,
 }
 
-function startProxy(routes, port){
+function startProxy(config){
+    var port = config.port;
     debug('Proxy 2: Attempting to start on port:', port);
 
     var proxy = rocky();
@@ -30,7 +31,7 @@ function startProxy(routes, port){
 
     app.use(proxy.middleware());
 
-    routes = routes.map((route)=>{
+    var routes = config.routes.map((route)=>{
         var src = true;
         var dest = false;
 
