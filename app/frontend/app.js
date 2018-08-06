@@ -20,6 +20,7 @@ Object.assign(window, {
     moment      : require('moment'),
     Toast       : toast,
     I           : require('immutable'),
+    _           : require('lodash')
 })
 
 var Dashboard = require('./components/dashboard.jsx');

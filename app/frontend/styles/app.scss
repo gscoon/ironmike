@@ -6,76 +6,92 @@ html, body
 #app_wrapper
 {
     // font-size: 13px;
-    background-color: #fff;
-    box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.5);
+    // background-color: #fff;
+    // box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.5);
     margin-top: 15px;
 
-    #request_list
+    #dashboard
     {
+        padding: 0 0 10px;
 
-        #request_list_header
+        #request_list
         {
-            border: #ccc solid;
-            border-width: 0 0 1px;
-            padding: 7px 0;
-            font-weight: bold;
-            background-color: #333;
-            color: #efefef;
-        }
+            padding: 0 0 10px;
 
-        .request_list_subheader
-        {
-            font-size: 15px;
-            color: #444;
-            font-weight: bold;
-        }
-
-        .request_list_row
-        {
-            padding: 5px 0;
-            border: #ccc dotted;
-            border-width: 0 0 1px;
-            font-size: 15px;
-
-            .request_list_row_lower
+            #request_list_header
             {
-                min-height: 100px;
-                margin: 10px 0 0;
-                display: none;
+                border: #ccc solid;
+                border-width: 0 0 1px;
+                padding-top: 7px;
+                padding-bottom: 7px;
+                margin-bottom: 7px;
+                font-weight: bold;
+                background-color: #333;
+                color: #efefef;
             }
 
-            .property_section
+            .request_list_subheader
             {
-                margin: 0 0 15px;
-                padding: 10px;
+                font-size: 15px;
+                color: #444;
+                font-weight: bold;
+            }
 
+            .request_list_row
+            {
+                padding-top: 7px;
+                padding-bottom: 7px;
+                margin-top: 7px;
+                margin-bottom: 7px;
+                font-size: 15px;
 
-                .property_section_inner
+                .request_list_row_lower
                 {
-                    border: #999 solid;
-                    border-width: 1px 0 0;
-                    padding: 5px 0;
+                    min-height: 100px;
+                    margin: 10px 0 0;
+                    display: none;
                 }
 
-                .property_section_title
+                .property_section
                 {
-                    font-size: 14px;
-                    padding: 0 0 5px;
-                    font-weight: bold;
-                }
+                    margin: 0 0 15px;
+                    padding: 10px;
 
-                .property_row
-                {
-                    font-size: 13px;
 
-                    .property_key
+                    .property_section_inner
                     {
-                        padding: 0 10px 0 0;
+                        border: #999 solid;
+                        border-width: 1px 0 0;
+                        padding: 5px 0;
+                    }
+
+                    .property_section_title
+                    {
+                        font-size: 14px;
+                        padding: 0 0 5px;
                         font-weight: bold;
                     }
-                }
-            }
 
+                    .property_row
+                    {
+                        font-size: 13px;
+
+                        .property_key
+                        {
+                            padding: 0 10px 0 0;
+                            font-weight: bold;
+                        }
+                    }
+                }
+
+            }
         }
     }
+}
+
+.ui.segment.clean_segment
+{
+    margin: 0;
+    padding: 0;
+    border: 0;
 }
