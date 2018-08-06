@@ -32,7 +32,7 @@ function start(port){
 
 var publicDir = Path.join(Main.rootDir, 'frontend/public/');
 
-app.use(express.static(publicDir))
+app.use(express.static(publicDir, {extensions:['html']}));
 app.use(bodyParser.json());
 app.use(favicon(Path.join(publicDir, 'images/favicon/favicon-32x32.png')));
 

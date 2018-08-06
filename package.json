@@ -4,7 +4,7 @@
   "scripts": {
     "start": "npm-run-all -p watch-css start-js",
     "start-js": "webpack-dev-server",
-    "webpack:watch": "webpack -d --watch",
+    "webpack:watch": "webpack -d --watch --config ./webpack/webpack.config.dev.js",
     "build-css": "node-sass-chokidar app/frontend/styles/ -o app/frontend/public/css/",
     "watch-css": "npm run build-css && node-sass-chokidar app/frontend/styles/ -o app/frontend/public/css/ --watch --recursive",
     "nodemon": "nodemon ./tests/web.js",

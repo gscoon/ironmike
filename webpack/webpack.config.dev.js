@@ -1,10 +1,10 @@
 const webpack   = require('webpack');
 const Path      = require('path');
-
+var base = Path.join(__dirname + '/../');
 var paths = {
-    src     : Path.join(__dirname + '/app/frontend'),
-    public  : Path.join(__dirname + '/app/frontend/public'),
-    styles  : Path.join(__dirname + '/app/frontend/styles'),
+    src     : Path.join(base, '/app/frontend'),
+    public  : Path.join(base, '/app/frontend/public'),
+    styles  : Path.join(base, '/app/frontend/styles'),
 }
 
 module.exports = {
@@ -14,7 +14,7 @@ module.exports = {
     output  : {
         path        : paths.public,
         publicPath  : '/',
-        filename    : 'bundle.js',
+        filename    : 'bundle.dev.js',
         sourceMapFilename: "./bundle.js.map",
         devtoolLineToLine: true,
     },

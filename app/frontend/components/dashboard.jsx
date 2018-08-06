@@ -16,7 +16,7 @@ class Dashboard extends Component {
         var requests = this.props.requests.toJS();
 
         var rows = requests.map((r, index)=>{
-            return <RequestRow request={r} num={index+1} key={index} />
+            return <RequestRow request={r} num={index+1} key={r.id} />
         });
 
         return (
@@ -46,7 +46,7 @@ class RequestRow extends Component {
         };
 
         // ever 10 seconds
-        var obj = Util.interval(10000, ()=>{
+        var obj = Util.interval(10 * 1000, ()=>{
             this.setState({counter: this.state.counter + 1})
         });
 
@@ -60,7 +60,6 @@ class RequestRow extends Component {
     }
 
     toggleDetails(){
-        console.log('Set show lower', this.state.showLower)
         this.setState({showLower: !this.state.showLower});
     }
 
@@ -131,9 +130,8 @@ class PropertiesSection extends Component {
             });
         }
         else if(this.props.json){
-            inner = <ReactJson src={this.props.json} name={null} />;
+            inner = <ReactJson src={this.props.json} name={null} collapsed={1} displayDataTypes={false} />;
         }
-
 
         return (
             <div className="property_section">
