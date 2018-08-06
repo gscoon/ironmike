@@ -15,8 +15,6 @@ module.exports = {
 
 function startProxy(config){
     var port = config.port;
-    debug('Proxy 2: Attempting to start on port:', port);
-
     var proxy = rocky();
 
     var app = express();
@@ -26,7 +24,7 @@ function startProxy(config){
     var http = require('http').Server(app);
 
     http.listen(port, ()=>{
-        debug('Proxy 2: Listening on port:', port);
+        debug('Proxy: Listening on port:', port);
     });
 
     app.use(proxy.middleware());

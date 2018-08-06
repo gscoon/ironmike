@@ -6,6 +6,7 @@ module.exports = {
     wait                : wait,
     waitasec            : waitasec,
     waitRand            : waitRand,
+    interval            : customInterval,
     // requests
     fetch               : customFetch,
     post                : customPost,
@@ -41,6 +42,24 @@ function customDel(url, data){
         body: JSON.stringify(data),
     })
     .then(response => response.json())
+}
+
+function customInterval(intvl, func, maxCount){
+    var count = 0;
+    var id = setInterval(()=>{
+        func();
+        count++;
+    }, intvl);
+
+    function stop(){
+        clearInterval(id);
+    }
+
+    return {
+        count   : count,
+        stop    : stop,
+        id      : id,
+    }
 }
 
 function wait(len){

@@ -41,7 +41,7 @@ class AppStore extends Reflux.Store
 
             this.setState({app: newApp});
             Toast.info("New requests", {
-                position: toast.POSITION.BOTTOM_RIGHT
+                position: Toast.POSITION.BOTTOM_RIGHT
             });
             this.parseLatestRequest();
         })
@@ -82,7 +82,7 @@ class AppStore extends Reflux.Store
 
             this.setState({app: newApp});
 
-            Toast.success("Removed");
+            Toast.info("Removed");
             Modal.hideLoader();
         })
         .catch(()=>{

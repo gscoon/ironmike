@@ -42,7 +42,7 @@ class App extends Reflux.Component {
         return (
             <div id="app_wrapper" className="container">
                 <Dashboard requests={this.state.app.get('requests')} />
-                <ToastContainer position="top-right" autoClose={3000} />
+                <ToastContainer position="top-right" autoClose={2000} />
             </div>
         );
     }

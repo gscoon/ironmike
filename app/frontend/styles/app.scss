@@ -39,19 +39,43 @@ html, body
 
             .request_list_row_lower
             {
-                background-color: #ccc;
                 min-height: 100px;
                 margin: 10px 0 0;
                 display: none;
+            }
 
-                .sub_container
+            .property_section
+            {
+                margin: 0 0 15px;
+                padding: 10px;
+
+
+                .property_section_inner
                 {
                     border: #999 solid;
-                    border-width: 0 0 1px;
-                    padding: 10px;
-                    margin-bottom: 10px;
+                    border-width: 1px 0 0;
+                    padding: 5px 0;
+                }
+
+                .property_section_title
+                {
+                    font-size: 14px;
+                    padding: 0 0 5px;
+                    font-weight: bold;
+                }
+
+                .property_row
+                {
+                    font-size: 13px;
+
+                    .property_key
+                    {
+                        padding: 0 10px 0 0;
+                        font-weight: bold;
+                    }
                 }
             }
+
         }
     }
 }

@@ -1,4 +1,5 @@
 import React, {Component} from 'react';
+import ReactJson from 'react-json-view'
 
 class Dashboard extends Component {
     constructor(props){
@@ -39,6 +40,16 @@ class Dashboard extends Component {
 class RequestRow extends Component {
     constructor(props){
         super(props);
+        this.state = {
+            counter     : 0,
+            showLower   : false,
+        };
+
+        // ever 10 seconds
+        var obj = Util.interval(10000, ()=>{
+            this.setState({counter: this.state.counter + 1})
+        });
+
     }
 
     handleDelete(){
@@ -48,8 +59,9 @@ class RequestRow extends Component {
         })
     }
 
-    showMore(){
-
+    toggleDetails(){
+        console.log('Set show lower', this.state.showLower)
+        this.setState({showLower: !this.state.showLower});
     }
 
     render(){
@@ -57,13 +69,17 @@ class RequestRow extends Component {
         var ts = r.timestmap || r.timestamp;
         var formattedTime = moment(ts).format('YYYY-MM-DD h:mm:ss a');
         var timeSince = moment(ts).fromNow();
+        r.body = r.body || {};
         var id = r.id.slice(-5);
+
+        var lowerStyle = {display: this.state.showLower ? 'block': 'none'};
+        var updown = "chevron " + (this.state.showLower ? 'up' : 'down');
         return (
             <div className="request_list_row">
                 <div className="request_list_row_upper row">
                     <div className="col-sm-1">{this.props.num}.</div>
                     <div className="col-sm-2">
-                        <UI.Button size="tiny" content="Details" color="blue" icon="chevron down" onClick={this.showMore.bind(this)} />
+                        <UI.Button size="tiny" content="Details" color="blue" icon={updown} onClick={this.toggleDetails.bind(this)} />
                     </div>
                     <div className="col-sm-1">{r.method}</div>
                     <div className="col-sm-2">{r.path}</div>
@@ -75,24 +91,57 @@ class RequestRow extends Component {
                         <UI.Button size="tiny" icon="trash" onClick={this.handleDelete.bind(this)} />
                     </div>
                 </div>
-                <div className="request_list_row_lower">
-                    <div className="sub_container">
-                        <div className="request_list_subheader">Headers</div>
+                <div className="request_list_row_lower" style={lowerStyle}>
+                    <div className="row">
+                        <div className="col-sm-6">
+                            <PropertiesSection title="Headers" properties={r.headers} />
+                        </div>
+                        <div className="col-sm-6">
+                            <PropertiesSection title="Query" properties={r.query} />
+                        </div>
                     </div>
-                    <div className="sub_container">
-                        <div className="request_list_subheader">Body</div>
-                    </div>
+                    <PropertiesSection title="Body" json={r.body} />
                 </div>
             </div>
         )
     }
 }
 
-class HeaderRow extends Component {
+class PropertiesSection extends Component {
+    constructor(props){
+        super(props);
+
+    }
+
+    getPropertyRow(key, val){
+        return (
+            <div className="property_row">
+                <span className="property_key">{key}:</span>
+                <span className="property_val">{val}</span>
+            </div>
+        )
+    }
 
     render(){
+        var inner = null;
+        if(this.props.properties){
+            var properties = this.props.properties || {};
+            inner = Object.keys(properties).map((k)=>{
+                return this.getPropertyRow(k, properties[k]);
+            });
+        }
+        else if(this.props.json){
+            inner = <ReactJson src={this.props.json} name={null} />;
+        }
+
+
         return (
-            <div class="row"></div>
+            <div className="property_section">
+                <div className="property_section_title">{this.props.title}:</div>
+                <div className="property_section_inner">
+                    {inner}
+                </div>
+            </div>
         )
     }
 }

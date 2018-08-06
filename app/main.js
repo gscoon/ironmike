@@ -38,7 +38,9 @@ function start(config){
         if(!config.webPort)
             config.webPort = freePorts.pop();
 
-        Handler.tunnel.start(config);
+        if(config.remote)
+            Handler.tunnel.start(config);
+            
         Handler.proxy.start(config);
         Handler.api.start(config.webPort);
     })

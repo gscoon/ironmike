@@ -7,11 +7,10 @@
     "webpack:watch": "webpack -d --watch",
     "build-css": "node-sass-chokidar app/frontend/styles/ -o app/frontend/public/css/",
     "watch-css": "npm run build-css && node-sass-chokidar app/frontend/styles/ -o app/frontend/public/css/ --watch --recursive",
-    "nodemon": "nodemon test.js",
+    "nodemon": "nodemon ./tests/web.js",
     "dev": "npm-run-all -p webpack:watch nodemon"
   },
   "dependencies": {
-    "anyproxy": "^4.0.10",
     "async": "^2.6.1",
     "axios": "^0.18.0",
     "bluebird": "^3.5.1",
@@ -31,6 +30,7 @@
     "npm-run-all": "^4.1.3",
     "opn": "^5.3.0",
     "react-dom": "^16.4.2",
+    "react-json-view": "^1.19.1",
     "react-toastify": "^4.1.0",
     "reflux": "^6.4.1",
     "reverse-tunnel-ssh": "^1.1.0",
