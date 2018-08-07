@@ -5,6 +5,11 @@ var dashboardActions = Reflux.createActions([
     "getLatestRequest",
     "getRequests",
     "deleteRequest",
+    "getRequests",
+]);
+
+var startActions = Reflux.createActions([
+    "getServers",
 ]);
 
 var settingsActions = Reflux.createActions([]);
@@ -12,4 +17,5 @@ var settingsActions = Reflux.createActions([]);
 module.exports = {
     dashboard   : dashboardActions,
     settings    : settingsActions,
+    start       : startActions,
 }

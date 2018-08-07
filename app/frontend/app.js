@@ -23,7 +23,8 @@ Object.assign(window, {
     _           : require('lodash')
 })
 
-var Dashboard = require('./components/dashboard.jsx');
+var DashboardView = require('./components/dashboard/index.jsx');
+var StartView = require('./components/start/index.jsx');
 
 class App extends Reflux.Component {
     constructor(props){
@@ -40,9 +41,16 @@ class App extends Reflux.Component {
     }
 
     render(){
+        if(this.state.tunnelStatus){
+            var content = <DashboardView requests={this.state.app.get('requests').toJS()} />
+        }
+        else {
+            var content = <StartView servers={this.state.app.get('servers').toJS()} />
+        }
+
         return (
             <div id="app_wrapper" className="container">
-                <Dashboard requests={this.state.app.get('requests')} />
+                {content}
                 <ToastContainer position="top-right" autoClose={2000} />
             </div>
         );
@@ -50,7 +58,6 @@ class App extends Reflux.Component {
 }
 
 ReactDOM.render(<App />, document.getElementById('app'))
-
 
 function getModal(){
     return {

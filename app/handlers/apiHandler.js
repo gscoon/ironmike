@@ -35,10 +35,18 @@ var publicDir = Path.join(Main.rootDir, 'frontend/public/');
 app.use(express.static(publicDir, {extensions:['html']}));
 app.use(bodyParser.json());
 app.use(favicon(Path.join(publicDir, 'images/favicon/favicon-32x32.png')));
+// app.use((req, res, next)=>{
+//     debug("Request :::", req.method, req.url);
+//     next();
+// })
 
+// Requests
 app.get('/api/requests', getAllRequests);
 app.get('/api/requests/:id', getLatestRequests);
 app.delete('/api/requests', deleteRequests);
+
+// Servers
+app.get('/api/servers', getAllServers);
 
 app.all('*', (req, res)=>res.status(404).send({status: false, code: 404}));
 
@@ -65,10 +73,20 @@ function getLatestRequests(req, res){
 }
 
 function deleteRequests(req, res){
-    debug(req.body);
     var requestIDs = req.body.requests;
-    var targets = Handler.data.remove('requests', (item)=>{
+    Handler.data.remove('requests', (item)=>{
         return requestIDs.indexOf(item.id) > -1
     });
     res.send({status: true})
+}
+
+function getAllServers(req, res){
+    var homeDir = require('os').homedir();
+    var configPath = Path.join(homeDir, ".ssh/config");
+
+    Util.parseSSHConfig(configPath)
+    .then((servers)=>{
+        return res.send({status: true, servers: servers});
+    })
+
 }

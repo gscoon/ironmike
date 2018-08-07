@@ -8,7 +8,7 @@ class Dashboard extends Component {
 
         Util.waitasec(1)
         .then(()=>{
-            setInterval(Actions.dashboard.getLatestRequest, 5000);
+            Util.interval(5000, Actions.dashboard.getLatestRequest);
         })
 
         this.state = {
@@ -27,7 +27,7 @@ class Dashboard extends Component {
     }
 
     render(){
-        var requests = this.props.requests.toJS();
+        var requests = this.props.requests;
         var perChunk = 10;
         var chunks = _.chunk(requests, perChunk);
         var rows = null;

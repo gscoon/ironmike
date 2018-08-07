@@ -5,16 +5,19 @@ class AppStore extends Reflux.Store
     constructor(){
         super();
         this.state = {
-            hasLoaded   : false,
-            latestReq   : null,
-            app         : I.fromJS({
-                requests: []
+            hasLoaded       : false,
+            latestReq       : null,
+            tunnelStatus    : false,
+            app             : I.fromJS({
+                servers         : [],
+                requests        : []
             })
         }; // <- set store's default state much like in React
 
         this.listenables = [
             Actions.dashboard,
-            Actions.settings
+            Actions.start,
+            Actions.settings,
         ];
     }
 
@@ -88,6 +91,19 @@ class AppStore extends Reflux.Store
         .catch(()=>{
             Toast.error("An error occurred.");
             Modal.hideLoader();
+        })
+    }
+
+    onGetServers(){
+        var url = '/api/servers';
+        Util.fetch(url)
+        .then((response)=>{
+            if(!response.status)
+                return;
+
+            var serverList = I.fromJS(response.servers);
+            var newApp = this.state.app.set('servers', serverList);
+            this.setState({app: newApp});
         })
     }
 

@@ -8,6 +8,7 @@ const glob          = require('glob');
 const async         = require('async');
 const mkdirp        = require('mkdirp');
 const uuidv4        = require('uuid/v4');
+const homeDir       = require('os').homedir();
 
 module.exports = {
     genID               : genID,
@@ -21,6 +22,8 @@ module.exports = {
     glob                : customGlob,
     mkdirp              : customMkdirp,
     rimraf              : customRimraf,
+    readFile            : readFile,
+    parseSSHConfig      : parseSSHConfig,
 }
 
 function wait(len){
@@ -149,4 +152,44 @@ function genID(len) {
 
 function genUID(){
     return uuidv4();
+}
+
+function readFile(src, options){
+    return new Promise(function(resolve, reject){
+        fs.readFile(src, options, function(err, buff){
+            if(err)
+                return reject(err);
+
+            resolve(buff);
+        })
+    })
+}
+
+function parseSSHConfig(configPath){
+    configPath = configPath || Path.join(homeDir, ".ssh/config");
+
+    if(!fs.existsSync(configPath))
+        return Promise.resolve([]);
+
+    return Util.readFile(configPath, 'utf8')
+    .then((data)=>{
+        var rows = data.split('\n');
+        var servers = [];
+        var currentServerIndex = -1;
+
+        rows.forEach((row)=>{
+            row = row.trim();
+            if(!row) return;
+            var items = row.split(' ');
+            var first = items.splice(0,1)[0];
+            if(first === 'Host'){
+                currentServerIndex++;
+                servers[currentServerIndex] = {};
+            }
+            servers[currentServerIndex][first] = items.join(' ');
+        })
+
+        return servers;
+    })
+
 }
