@@ -10,6 +10,7 @@ var dashboardActions = Reflux.createActions([
 
 var startActions = Reflux.createActions([
     "getServers",
+    "checkTunnel",
 ]);
 
 var settingsActions = Reflux.createActions([]);

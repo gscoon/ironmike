@@ -23,6 +23,8 @@ Object.assign(window, {
     _           : require('lodash')
 })
 
+window.Shared = require('./components/shared/index.jsx');
+
 var DashboardView = require('./components/dashboard/index.jsx');
 var StartView = require('./components/start/index.jsx');
 

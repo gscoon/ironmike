@@ -30,7 +30,7 @@ class AppStore extends Reflux.Store
         if(!latest) return;
 
         var url = '/api/requests/' + latest.id;
-        Util.fetch(url)
+        Util.get(url)
         .then((res)=>{
             Modal.hideLoader();
             if(!res.status || !res.data.length)
@@ -55,7 +55,7 @@ class AppStore extends Reflux.Store
     onGetRequests(){
         Modal.showLoader();
         var url = '/api/requests';
-        Util.fetch(url)
+        Util.get(url)
         .then((res)=>{
             Modal.hideLoader();
             if(!res.status)
@@ -96,7 +96,7 @@ class AppStore extends Reflux.Store
 
     onGetServers(){
         var url = '/api/servers';
-        Util.fetch(url)
+        Util.get(url)
         .then((response)=>{
             if(!response.status)
                 return;
@@ -105,6 +105,23 @@ class AppStore extends Reflux.Store
             var newApp = this.state.app.set('servers', serverList);
             this.setState({app: newApp});
         })
+    }
+
+    onCheckTunnel(data){
+        var url = '/api/tunnel/check';
+        Util.post(url, data)
+        .then((response)=>{
+            console.log("tunnel", response);
+            if(!response.status)
+                return sendError();
+
+            Toast.success("Connection successful.");
+        })
+        .catch(sendError)
+
+        function sendError(){
+            Toast.error("An error occurred.");
+        }
     }
 
     parseLatestRequest(){

@@ -11,12 +11,20 @@ html, body
     margin-top: 15px;
     #start_view
     {
-        width: 500px;
-        margin: 10px auto 0;
-        padding: 10px 0;
-        background: rgb(255, 255, 255);
-        box-shadow: rgb(204, 204, 204) 0px 1px 2px;
+        margin: 0;
 
+        #start_view_steps
+        {
+            margin: 0 auto 15px;
+        }
+
+        #start_view_inner
+        {
+            width: 500px;
+            padding: 10px;
+            background: rgb(255, 255, 255);
+            box-shadow: rgb(204, 204, 204) 0px 1px 2px;
+        }
     }
 
     #dashboard
@@ -94,6 +102,24 @@ html, body
                     }
                 }
 
+            }
+        }
+    }
+
+    .fields
+    {
+        .disabled
+        {
+            opacity: 1;
+
+            .input
+            {
+                opacity: .7;
+            }
+
+            label
+            {
+                opacity: 1;
             }
         }
     }

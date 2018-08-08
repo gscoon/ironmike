@@ -48,6 +48,8 @@ app.delete('/api/requests', deleteRequests);
 // Servers
 app.get('/api/servers', getAllServers);
 
+app.post('/api/tunnel/check', checkTunnel);
+
 app.all('*', (req, res)=>res.status(404).send({status: false, code: 404}));
 
 function getAllRequests(req, res){
@@ -81,12 +83,19 @@ function deleteRequests(req, res){
 }
 
 function getAllServers(req, res){
-    var homeDir = require('os').homedir();
-    var configPath = Path.join(homeDir, ".ssh/config");
-
-    Util.parseSSHConfig(configPath)
+    Handler.tunnel.getServers()
     .then((servers)=>{
         return res.send({status: true, servers: servers});
     })
+}
 
+function checkTunnel(req, res){
+    Handler.tunnel.check(req.body)
+    .then(()=>{
+        res.send({status: true})
+    })
+    .catch((err)=>{
+        debug(err);
+        res.send({status: false, err: err})
+    })
 }

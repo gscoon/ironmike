@@ -8,12 +8,12 @@ module.exports = {
     waitRand            : waitRand,
     interval            : customInterval,
     // requests
-    fetch               : customFetch,
+    get                 : customGet,
     post                : customPost,
     del                 : customDel,
 }
 
-function customFetch(url){
+function customGet(url){
     return fetch(url)
     .then(function(response) {
         return response.json();
