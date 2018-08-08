@@ -3,7 +3,7 @@ const Path      = require('path');
 var base = Path.join(__dirname + '/../');
 var paths = {
     src     : Path.join(base, '/app/frontend'),
-    public  : Path.join(base, '/app/frontend/public'),
+    public  : Path.join(base, '/app/public'),
     styles  : Path.join(base, '/app/frontend/styles'),
 }
 

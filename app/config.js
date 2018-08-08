@@ -5,9 +5,10 @@ const appKey        = 'ironmike';
 const appData       = Path.join(homedir, '.' + appKey);
 
 module.exports = {
-    paths : {
+    paths   : {
         home    : homedir,
         appData : appData,
         db      : Path.join(appData, 'db.json')
-    }
+    },
+    isDev   : process.env.NODE_ENV === 'development',
 }

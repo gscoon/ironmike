@@ -6,15 +6,31 @@ class Start extends Component {
         this.state = {
             hostKey     : null,
             authType    : 'password',
+            counter     : 0
         }
 
         this.form = {};
+        this.customServerKey = '==custom==';
 
         Util.wait().then(Actions.start.getServers);
     }
 
     handleHostChange(evt, data){
-        this.setState({hostKey: data.value})
+        var servers = this.props.servers || [];
+        var activeHostData = _.find(servers, {title: data.value});
+        var authType = (activeHostData && activeHostData.identityFile) ? 'key' : 'password';
+        // key status set
+        if(authType === 'key')
+            activeHostData.isKeySet = 1;
+
+        this.setState({hostKey: data.value, authType: authType})
+    }
+
+    handleKeySetStatus(val){
+        var servers = this.props.servers || [];
+        var activeHostData = _.find(servers, {title: this.state.hostKey});
+        activeHostData.isKeySet = val ? 1 : 0;
+        this.setState({counter: this.state.counter+1})
     }
 
     handleAuthChange(evt, data){
@@ -44,8 +60,12 @@ class Start extends Component {
         Actions.start.checkTunnel(data);
     }
 
-    getCustomForm(_data){
-        var data = _data || {};
+    handleFileChange(evt){
+        console.log('handleFileChange:', evt.target.files);
+    }
+
+    getCustomForm(data){
+        data = data || {};
 
         var fields = {
             host        : null,
@@ -62,15 +82,28 @@ class Start extends Component {
         if(this.state.authType === 'password'){
             authField = <StartField width={8} type="password" fluid label='Password' placeholder='Password' ref={(r)=>{
                 this.form.password = r;
-                if(_data)this.focusable = r;
+                if(Object.keys(data).length) this.focusable = r;
             }} />
         }
         else {
+            if(data.isKeySet){
+                var keyInput = (
+                    <div>
+                        <span>{data.identityFile}</span>
+                        <br />
+                        <label htmlFor="upload" className="key_link">Change</label>
+                    </div>
+                )
+            }
+            else {
+                var keyInput = <label htmlFor="upload" className="key_link">Select a file</label>
+            }
+
             authField = (
                 <UI.Form.Field fluid width={8}>
-                    <label for="upload">Private Key</label>
-                    <UI.Button icon="upload" label={{basic: true, content: 'Select file(s)'}} labelPosition="right" />
-                    <input hidden id="upload" type="file" />
+                    <label htmlFor="upload">Private Key:</label>
+                    {keyInput}
+                    <input hidden id="upload" type="file" onChange={this.handleFileChange.bind(this)} />
                 </UI.Form.Field>
             )
         }
@@ -112,7 +145,7 @@ class Start extends Component {
     render(){
         var hostOptions = [{
             text : '(New Host)',
-            value : '==custom==',
+            value : this.customServerKey,
         }];
 
         var servers = this.props.servers || [];
@@ -121,7 +154,6 @@ class Start extends Component {
         })
 
         var bottom = null;
-
         var activeHostData = _.find(servers, {title: this.state.hostKey});
 
         if(this.state.hostKey)

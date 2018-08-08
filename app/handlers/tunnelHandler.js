@@ -125,24 +125,34 @@ function getOptions(remote){
 
 function getServers(){
     var homeDir = require('os').homedir();
-    var configPath = Path.join(homeDir, ".ssh/config");
-    return parseSSHConfig(configPath)
+    var sshDir = Path.join(homeDir, ".ssh");
+    return parseSSHConfig(sshDir)
 }
 
-function parseSSHConfig(configPath){
-    configPath = configPath || Path.join(homeDir, ".ssh/config");
+function parseSSHConfig(sshDir){
+    sshDir = sshDir || Path.join(homeDir, ".ssh/");
+
+    var configPath = Path.join(sshDir, 'config');
+    var defaultKeyPath = Path.join(sshDir, 'id_rsa');
+
     var mapper = {
-        'Host'      : 'title',
-        'Port'      : 'port',
-        'HostName'  : 'host',
-        'User'      : 'username',
+        'Host'          : 'title',
+        'Port'          : 'port',
+        'HostName'      : 'host',
+        'User'          : 'username',
+        'IdentityFile'  : 'identityFile'
     };
 
     if(!fs.existsSync(configPath))
         return Promise.resolve([]);
 
+    var defaultKey = null;
+    if(fs.existsSync(defaultKeyPath))
+        defaultKey = defaultKeyPath;
+
     return Util.readFile(configPath, 'utf8')
     .then((data)=>{
+        debug(configPath);
         var rows = data.split('\n');
         var servers = [];
         var currentServerIndex = -1;
@@ -154,8 +164,10 @@ function parseSSHConfig(configPath){
             var first = items.splice(0,1)[0];
             if(first === 'Host'){
                 currentServerIndex++;
+                // set server defaults
                 servers[currentServerIndex] = {
-                    port : 22
+                    port            : 22,
+                    identityFile    : defaultKey
                 };
             }
 

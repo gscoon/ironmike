@@ -30,15 +30,20 @@ function start(port){
     // });
 }
 
-var publicDir = Path.join(Main.rootDir, 'frontend/public/');
+var publicDir = Path.join(Main.rootDir, 'public/');
+
+app.use((req, res, next)=>{
+    debug("Request :::", process.env.NODE_ENV, Config.isDev, req.method, req.url);
+    if(req.url === '/' && Config.isDev)
+        return res.redirect('/dev');
+
+    next();
+})
 
 app.use(express.static(publicDir, {extensions:['html']}));
 app.use(bodyParser.json());
 app.use(favicon(Path.join(publicDir, 'images/favicon/favicon-32x32.png')));
-// app.use((req, res, next)=>{
-//     debug("Request :::", req.method, req.url);
-//     next();
-// })
+
 
 // Requests
 app.get('/api/requests', getAllRequests);
