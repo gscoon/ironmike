@@ -1,4 +1,5 @@
 
 module.exports = {
-    Steps : require('./steps.jsx')
+    Steps   : require('./steps.jsx'),
+    Header  : require('./header.jsx'),
 }

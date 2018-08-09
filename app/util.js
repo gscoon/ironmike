@@ -23,6 +23,7 @@ module.exports = {
     mkdirp              : customMkdirp,
     rimraf              : customRimraf,
     readFile            : readFile,
+    interval            : customInterval,
 }
 
 function wait(len){
@@ -162,4 +163,22 @@ function readFile(src, options){
             resolve(buff);
         })
     })
+}
+
+function customInterval(intvl, func, maxCount){
+    var count = 0;
+    var id = setInterval(()=>{
+        func();
+        count++;
+    }, intvl);
+
+    function stop(){
+        clearInterval(id);
+    }
+
+    return {
+        count   : count,
+        stop    : stop,
+        id      : id,
+    }
 }

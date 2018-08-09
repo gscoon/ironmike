@@ -11,23 +11,36 @@ const opn           = require('opn');
 var debug = Util.getDebugger('api');
 
 module.exports = {
-    start : start
+    start   : start,
+    getHost : getHost,
 }
 
 var app = express();
+var apiPort;
 
 function start(port){
-    var http = require('http').Server(app);
-    var io = socketIO(http);
+    return new Promise((resolve, reject)=>{
+        apiPort = port;
+        var http = require('http').Server(app);
+        var io = socketIO(http);
 
-    http.listen(port, ()=>{
-        debug('API: listening to port', port);
-        // opn('http://localhost:' + port);
+        http.listen(port, (err)=>{
+            if(err)
+                return reject(err);
+                
+            debug('API: listening to port', port);
+            // opn('http://localhost:' + port);
+            resolve();
+        })
+
+        // io.on('connection', function(socket){
+        //     debug('a user connected');
+        // });
     })
+}
 
-    // io.on('connection', function(socket){
-    //     debug('a user connected');
-    // });
+function getHost(){
+    return "http://localhost:"+apiPort
 }
 
 var publicDir = Path.join(Main.rootDir, 'public/');
@@ -42,7 +55,7 @@ app.use((req, res, next)=>{
 
 app.use(express.static(publicDir, {extensions:['html']}));
 app.use(bodyParser.json());
-app.use(favicon(Path.join(publicDir, 'images/favicon/favicon-32x32.png')));
+// app.use(favicon(Path.join(publicDir, 'images/favicon/favicon-32x32.png')));
 
 
 // Requests

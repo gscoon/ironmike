@@ -14,6 +14,8 @@ class AppStore extends Reflux.Store
             })
         }; // <- set store's default state much like in React
 
+        this.apiHost = Handler.api.getHost();
+
         this.listenables = [
             Actions.dashboard,
             Actions.start,
@@ -21,15 +23,28 @@ class AppStore extends Reflux.Store
         ];
     }
 
-    onAddRequestRow(data){
+    getEndpoint(url){
+        return this.apiHost + url;
+    }
 
+    onGetServers(){
+        var url = this.getEndpoint('/api/servers');
+        Util.get(url)
+        .then((response)=>{
+            if(!response.status)
+                return;
+
+            var serverList = I.fromJS(response.servers);
+            var newApp = this.state.app.set('servers', serverList);
+            this.setState({app: newApp});
+        })
     }
 
     onGetLatestRequest(){
         var latest = this.state.latestReq || this.parseLatestRequest();
         if(!latest) return;
 
-        var url = '/api/requests/' + latest.id;
+        var url = this.getEndpoint('/api/requests/' + latest.id);
         Util.get(url)
         .then((res)=>{
             Modal.hideLoader();
@@ -54,7 +69,11 @@ class AppStore extends Reflux.Store
 
     onGetRequests(){
         Modal.showLoader();
-        var url = '/api/requests';
+        var url = this.getEndpoint('/api/requests');
+
+        var requestList = Handler.data.get('requests');
+        requestList = _.orderBy(requestList, ['unixTimestamp'], ['desc']);
+
         Util.get(url)
         .then((res)=>{
             Modal.hideLoader();
@@ -74,8 +93,8 @@ class AppStore extends Reflux.Store
 
     onDeleteRequest(id){
         Modal.showLoader();
-
-        Util.del('/api/requests',{requests: [id]})
+        var url = this.getEndpoint('/api/requests');
+        Util.del(url, {requests: [id]})
         .then((res)=>{
             var newApp = this.state.app.updateIn(['requests'], (requests)=>{
                 return requests.filter((item)=>{
@@ -91,19 +110,6 @@ class AppStore extends Reflux.Store
         .catch(()=>{
             Toast.error("An error occurred.");
             Modal.hideLoader();
-        })
-    }
-
-    onGetServers(){
-        var url = '/api/servers';
-        Util.get(url)
-        .then((response)=>{
-            if(!response.status)
-                return;
-
-            var serverList = I.fromJS(response.servers);
-            var newApp = this.state.app.set('servers', serverList);
-            this.setState({app: newApp});
         })
     }
 

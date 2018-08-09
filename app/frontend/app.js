@@ -1,3 +1,7 @@
+'use babel';
+
+const {remote, ipcRenderer} = require('electron');
+
 import React, {Component} from 'react';
 import Reflux from 'reflux';
 import ReactDOM from 'react-dom';
@@ -5,22 +9,22 @@ import swal from 'sweetalert2';
 
 import { ToastContainer, toast } from 'react-toastify';
 
-// Styling
-import 'react-toastify/dist/ReactToastify.css';
-import './styles/app.scss';
-import './styles/dependencies/grid12.css';
-import 'semantic-ui-css/semantic.min.css';
+var Handler        = remote.getGlobal("Handler");
+
+Object.assign(window, {
+    Handler : Handler,
+})
 
 Object.assign(window, {
     Actions     : require('./actions/'),
     AppStore    : require('./store/'),
-    Util        : require('./util.js'),
+    Util        : require('./frontend.util.js'),
     UI          : require('semantic-ui-react'),
     Modal       : getModal(),
     moment      : require('moment'),
     Toast       : toast,
     I           : require('immutable'),
-    _           : require('lodash')
+    _           : require('lodash'),
 })
 
 window.Shared = require('./components/shared/index.jsx');
@@ -51,9 +55,12 @@ class App extends Reflux.Component {
         }
 
         return (
-            <div id="app_wrapper" className="container">
-                {content}
-                <ToastContainer position="top-right" autoClose={2000} />
+            <div id="outer">
+                <Shared.Header />
+                <div id="app_wrapper" className="container">
+                    {content}
+                    <ToastContainer position="top-right" autoClose={2000} />
+                </div>
             </div>
         );
     }
