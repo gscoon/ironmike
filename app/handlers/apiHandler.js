@@ -27,7 +27,7 @@ function start(port){
         http.listen(port, (err)=>{
             if(err)
                 return reject(err);
-                
+
             debug('API: listening to port', port);
             // opn('http://localhost:' + port);
             resolve();

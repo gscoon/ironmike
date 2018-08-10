@@ -16,9 +16,11 @@ global.Main = {
 
 global.Config = require('./config.js');
 global.Util = require('./util.js');
-global.Handler = Util.getHandlers(Path.join(__dirname, 'handlers'));
 
-require('electron-reload')(__dirname, {
+var handlerDir = Path.join(__dirname, '/handlers/');
+global.Handler = Util.getHandlers(handlerDir);
+
+require('electron-reload')([__dirname, handlerDir], {
     // Note that the path to electron may vary according to the main file
     electron: require(`${__dirname}/../node_modules/electron`)
 });
@@ -37,14 +39,6 @@ function start(config){
     config = config || {};
 
     debug('App: Starting...');
-
-    mainWindow = new BrowserWindow({
-        width   : 800,
-        height  : 500,
-        frame   : false
-    });
-    mainWindow.webContents.openDevTools();
-    mainWindow.loadURL(`file://${__dirname}/frontend/index.html`);
 
     // config.routes = config.routes || [];
 
@@ -71,9 +65,9 @@ function start(config){
 
 function launchWindow(){
     mainWindow = new BrowserWindow({
-        width: 500,
-        height: 500,
-        frame: false
+        width   : 800,
+        height  : 600,
+        frame   : false
     });
     mainWindow.webContents.openDevTools();
     mainWindow.loadURL(`file://${__dirname}/frontend/index.html`);

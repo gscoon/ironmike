@@ -3,21 +3,18 @@
 const {remote, ipcRenderer} = require('electron');
 
 import React, {Component} from 'react';
-import Reflux from 'reflux';
-import ReactDOM from 'react-dom';
-import swal from 'sweetalert2';
-
 import { ToastContainer, toast } from 'react-toastify';
 
-var Handler        = remote.getGlobal("Handler");
+const Reflux    = require('reflux');
+const ReactDOM  = require('react-dom');
+const swal      = require('sweetalert2');
+const events    = require('events');
+
+window.App      = new events.EventEmitter();
 
 Object.assign(window, {
-    Handler : Handler,
-})
-
-Object.assign(window, {
+    Handler     : remote.getGlobal("Handler"),
     Actions     : require('./actions/'),
-    AppStore    : require('./store/'),
     Util        : require('./frontend.util.js'),
     UI          : require('semantic-ui-react'),
     Modal       : getModal(),
@@ -27,12 +24,19 @@ Object.assign(window, {
     _           : require('lodash'),
 })
 
+window.AppStore = require('./store/');
+
+Object.assign(App, {
+    apiHost         : Handler.api.getHost(),
+    getEndpoint     : getEndpoint,
+});
+
 window.Shared = require('./components/shared/index.jsx');
 
 var DashboardView = require('./components/dashboard/index.jsx');
 var StartView = require('./components/start/index.jsx');
 
-class App extends Reflux.Component {
+class AppView extends Reflux.Component {
     constructor(props){
         super(props);
         this.store = AppStore;
@@ -51,7 +55,7 @@ class App extends Reflux.Component {
             var content = <DashboardView requests={this.state.app.get('requests').toJS()} />
         }
         else {
-            var content = <StartView servers={this.state.app.get('servers').toJS()} />
+            var content = <StartView servers={this.state.temp.get('servers').toJS()} />
         }
 
         return (
@@ -59,14 +63,14 @@ class App extends Reflux.Component {
                 <Shared.Header />
                 <div id="app_wrapper" className="container">
                     {content}
-                    <ToastContainer position="top-right" autoClose={2000} />
+                    <ToastContainer position="bottom-right" autoClose={2000} />
                 </div>
             </div>
         );
     }
 }
 
-ReactDOM.render(<App />, document.getElementById('app'))
+ReactDOM.render(<AppView />, document.getElementById('app'))
 
 function getModal(){
     return {
@@ -130,4 +134,8 @@ function getModal(){
             })
         }
     }
+}
+
+function getEndpoint(url){
+    return this.apiHost + url;
 }

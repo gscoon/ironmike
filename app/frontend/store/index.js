@@ -4,17 +4,23 @@ class AppStore extends Reflux.Store
 {
     constructor(){
         super();
+
+        var appData = Handler.data.get('app');
+
+        var defaultApp = I.fromJS({
+            requests        : [],
+            activeSSH       : null,
+        });
+
         this.state = {
             hasLoaded       : false,
             latestReq       : null,
             tunnelStatus    : false,
-            app             : I.fromJS({
-                servers         : [],
-                requests        : []
-            })
+            temp            : I.fromJS({
+                servers        : []
+            }),
+            app             : defaultApp.mergeDeep(appData),
         }; // <- set store's default state much like in React
-
-        this.apiHost = Handler.api.getHost();
 
         this.listenables = [
             Actions.dashboard,
@@ -23,20 +29,20 @@ class AppStore extends Reflux.Store
         ];
     }
 
-    getEndpoint(url){
-        return this.apiHost + url;
+    onSetActiveServer(data){
+        this.setState({activeSSH: data});
     }
 
     onGetServers(){
-        var url = this.getEndpoint('/api/servers');
+        var url = App.getEndpoint('/api/servers');
         Util.get(url)
         .then((response)=>{
             if(!response.status)
                 return;
 
             var serverList = I.fromJS(response.servers);
-            var newApp = this.state.app.set('servers', serverList);
-            this.setState({app: newApp});
+            var newTemp = this.state.temp.set('servers', serverList);
+            this.setState({temp: newTemp});
         })
     }
 
@@ -44,7 +50,7 @@ class AppStore extends Reflux.Store
         var latest = this.state.latestReq || this.parseLatestRequest();
         if(!latest) return;
 
-        var url = this.getEndpoint('/api/requests/' + latest.id);
+        var url = App.getEndpoint('/api/requests/' + latest.id);
         Util.get(url)
         .then((res)=>{
             Modal.hideLoader();
@@ -69,7 +75,7 @@ class AppStore extends Reflux.Store
 
     onGetRequests(){
         Modal.showLoader();
-        var url = this.getEndpoint('/api/requests');
+        var url = App.getEndpoint('/api/requests');
 
         var requestList = Handler.data.get('requests');
         requestList = _.orderBy(requestList, ['unixTimestamp'], ['desc']);
@@ -93,7 +99,7 @@ class AppStore extends Reflux.Store
 
     onDeleteRequest(id){
         Modal.showLoader();
-        var url = this.getEndpoint('/api/requests');
+        var url = App.getEndpoint('/api/requests');
         Util.del(url, {requests: [id]})
         .then((res)=>{
             var newApp = this.state.app.updateIn(['requests'], (requests)=>{
@@ -113,21 +119,8 @@ class AppStore extends Reflux.Store
         })
     }
 
-    onCheckTunnel(data){
-        var url = '/api/tunnel/check';
-        Util.post(url, data)
-        .then((response)=>{
-            console.log("tunnel", response);
-            if(!response.status)
-                return sendError();
+    onSetSSH(data){
 
-            Toast.success("Connection successful.");
-        })
-        .catch(sendError)
-
-        function sendError(){
-            Toast.error("An error occurred.");
-        }
     }
 
     parseLatestRequest(){
@@ -148,6 +141,18 @@ class AppStore extends Reflux.Store
 
     formatLatest(r){
         return {id: r.get('id'), timestamp: r.get('unixTimestamp')};
+    }
+
+    persist(forceBlast){
+        if(this.disablePersist){
+            debug.error(moment().format(), "Persist disabled");
+            return;
+        }
+
+        var data = this.state.app.toJS();
+        delete data.temp;
+        console.log(moment().format(), "Persisting")
+        Handler.data.set('app', data, !forceBlast);
     }
 }
 

@@ -37,7 +37,9 @@ function start(){
 
 function getDefaults(){
     return {
-        requests : [],
+        app : {
+            requests : [],
+        }
     }
 }
 

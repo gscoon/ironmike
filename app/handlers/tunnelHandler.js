@@ -93,7 +93,7 @@ function checkTunnel(remote){
     return new Promise((resolve, reject)=>{
         var conn = new ssh2.Client();
         var options = getOptions(remote);
-        debug(options);
+
         conn.connect(options)
 
         conn.on('error', (err) => {
@@ -114,8 +114,8 @@ function getOptions(remote){
         port        : remote.port || 22,
     };
 
-    if(remote.privateKey)
-        options.privateKey;
+    if(remote.identityFile)
+        options.privateKey = fs.readFileSync(remote.identityFile, 'utf8');
 
     if(remote.password)
         options.password = remote.password;
@@ -152,7 +152,6 @@ function parseSSHConfig(sshDir){
 
     return Util.readFile(configPath, 'utf8')
     .then((data)=>{
-        debug(configPath);
         var rows = data.split('\n');
         var servers = [];
         var currentServerIndex = -1;
