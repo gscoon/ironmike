@@ -88,7 +88,6 @@ class Start extends Component {
                 Toast.error("An error occurred.");
             }
         }
-
     }
 
     setPorts(){
@@ -275,7 +274,7 @@ class Start extends Component {
                 <UI.Segment id="start_view_inner" loading={this.state.loading}>
                     <UI.Form>
                         <UI.Form.Group>
-                            <StartField required type="number" label="Remote Port" placeholder="Port Number" width={4} ref={(r)=>{this.forms.proxy.remotePort = r}} />
+                            <StartField required type="number" label="Remote Port" placeholder="Port Number" width={4} ref={(r)=>{this.forms.proxy.remotePort = this.focusable = r}} />
                         </UI.Form.Group>
                         <UI.Segment>
                             <UI.Form.Group>

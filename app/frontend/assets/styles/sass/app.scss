@@ -1,3 +1,5 @@
+$img-dir: "./../images";
+
 html, body
 {
     background-color: #efefef !important;
@@ -13,14 +15,136 @@ html, body
 
 #header
 {
-	background-color: #333;
-	height: 45px;
-	padding: 0;
-	text-align: center;
-	-ms-overflow-style: scrollbar;
+    background-color: #111;
+    height: 45px;
+    padding: 0;
+    text-align: center;
+    -ms-overflow-style: scrollbar;
     -webkit-app-region:drag;
-	position: relative;
-	z-index: 99999;
+    position: relative;
+    z-index: 99999;
+    color: #fff;
+    font-size: 18px;
+    font-weight: bold;
+
+    .title
+    {
+        padding: 13px 0 0;
+    }
+
+    #logo
+    {
+        width: 30px;
+    }
+
+    #app_sidebar_button
+	{
+		background-color: #111;
+		height: 45px;
+
+		.item
+		{
+			border-radius: 0;
+		}
+	}
+
+    .edge
+	{
+		position: absolute;
+		-webkit-app-region: no-drag;
+		top: 0;
+
+		&#edge-left
+		{
+			width: 4px;
+			height: 100%;
+			left: 0;
+		}
+
+		&#edge-top
+		{
+			width: 100%;
+			height: 4px;
+			left: 0;
+		}
+
+		&#edge-right
+		{
+			width: 2px;
+			height: 100%;
+			right: 0;
+		}
+	}
+
+    #window-controls
+	{
+		position: absolute;
+		right: 5px;
+		top: 5px;
+		-webkit-app-region: no-drag;
+
+		a.window-control
+		{
+			position: relative;
+			display: inline-block;
+			height: 30px;
+			width: 56px;
+			color: #999;
+			cursor: default;
+			background-position: center;
+			background-repeat: no-repeat;
+
+			&:hover
+			{
+				background-color: #404040;
+				color: #fff;
+
+				&[data-control="close"]
+				{
+					background-color: #e81123;
+				}
+			}
+
+			&[data-control="min"]
+			{
+				background-image: url($img-dir + "/system/windows/min.png");
+
+				&:hover
+				{
+					background-image: url($img-dir + "/system/windows/min-hover.png");
+				}
+			}
+
+			&[data-control="max"]
+			{
+				background-image: url($img-dir + "/system/windows/max.png");
+				&:hover
+				{
+					background-image: url($img-dir + "/system/windows/max-hover.png");
+				}
+			}
+
+			&[data-control="close"]
+			{
+				background-image: url($img-dir + "/system/windows/x.png");
+
+				&:hover
+				{
+					background-image: url($img-dir + "/system/windows/x-hover.png");
+				}
+			}
+
+			&[data-control="unmax"]
+			{
+				background-image: url($img-dir + "/system/windows/unmax.png");
+
+				&:hover
+				{
+					background-image: url($img-dir + "/system/windows/unmax-hover.png");
+				}
+			}
+		}
+	}
 }
 
 #app_wrapper

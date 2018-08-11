@@ -7,14 +7,77 @@ html, body {
   -webkit-app-region: no-drag !important; }
 
 #header {
-  background-color: #333;
+  background-color: #111;
   height: 45px;
   padding: 0;
   text-align: center;
   -ms-overflow-style: scrollbar;
   -webkit-app-region: drag;
   position: relative;
-  z-index: 99999; }
+  z-index: 99999;
+  color: #fff;
+  font-size: 18px;
+  font-weight: bold; }
+  #header .title {
+    padding: 13px 0 0; }
+  #header #logo {
+    width: 30px; }
+  #header #app_sidebar_button {
+    background-color: #111;
+    height: 45px; }
+    #header #app_sidebar_button .item {
+      border-radius: 0; }
+  #header .edge {
+    position: absolute;
+    -webkit-app-region: no-drag;
+    top: 0; }
+    #header .edge#edge-left {
+      width: 4px;
+      height: 100%;
+      left: 0; }
+    #header .edge#edge-top {
+      width: 100%;
+      height: 4px;
+      left: 0; }
+    #header .edge#edge-right {
+      width: 2px;
+      height: 100%;
+      right: 0; }
+  #header #window-controls {
+    position: absolute;
+    right: 5px;
+    top: 5px;
+    -webkit-app-region: no-drag; }
+    #header #window-controls a.window-control {
+      position: relative;
+      display: inline-block;
+      height: 30px;
+      width: 56px;
+      color: #999;
+      cursor: default;
+      background-position: center;
+      background-repeat: no-repeat; }
+      #header #window-controls a.window-control:hover {
+        background-color: #404040;
+        color: #fff; }
+        #header #window-controls a.window-control:hover[data-control="close"] {
+          background-color: #e81123; }
+      #header #window-controls a.window-control[data-control="min"] {
+        background-image: url("./../images/system/windows/min.png"); }
+        #header #window-controls a.window-control[data-control="min"]:hover {
+          background-image: url("./../images/system/windows/min-hover.png"); }
+      #header #window-controls a.window-control[data-control="max"] {
+        background-image: url("./../images/system/windows/max.png"); }
+        #header #window-controls a.window-control[data-control="max"]:hover {
+          background-image: url("./../images/system/windows/max-hover.png"); }
+      #header #window-controls a.window-control[data-control="close"] {
+        background-image: url("./../images/system/windows/x.png"); }
+        #header #window-controls a.window-control[data-control="close"]:hover {
+          background-image: url("./../images/system/windows/x-hover.png"); }
+      #header #window-controls a.window-control[data-control="unmax"] {
+        background-image: url("./../images/system/windows/unmax.png"); }
+        #header #window-controls a.window-control[data-control="unmax"]:hover {
+          background-image: url("./../images/system/windows/unmax-hover.png"); }
 
 #app_wrapper {
   padding-top: 15px; }

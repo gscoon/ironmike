@@ -20,7 +20,7 @@ module.exports = {
     getAllRequests      : getAllRequests,
     getLatestRequests   : getLatestRequests,
     deleteRequests      : deleteRequests,
-    getAllServers       : getAllServers,
+    getServers          : getServers,
     checkTunnel         : checkTunnel,
     setTunnel           : setTunnel,
     getTunnel           : getTunnel,
@@ -37,7 +37,7 @@ app.get('/api/requests/:id', rh.bind(getLatestRequests));
 app.delete('/api/requests', rh.bind(deleteRequests));
 
 // Servers
-app.get('/api/servers', rh.bind(getAllServers));
+app.get('/api/servers', rh.bind(getServers));
 
 // // Ports
 // app.get('/api/proxy', rh.bind(getAllServers));
@@ -109,7 +109,7 @@ function deleteRequests(body){
     return Promise.resolve();
 }
 
-function getAllServers(body){
+function getServers(body){
     return Handler.tunnel.getServers()
     .then((servers)=>{
         return {servers: servers};

@@ -14,6 +14,7 @@ window.App      = new events.EventEmitter();
 
 Object.assign(window, {
     Handler     : remote.getGlobal("Handler"),
+    Main        : remote.getGlobal("Main"),
     Actions     : require('./actions/'),
     Util        : require('./frontend.util.js'),
     UI          : require('semantic-ui-react'),
