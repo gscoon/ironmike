@@ -13,6 +13,7 @@ var startActions = Reflux.createActions([
     "checkTunnel",
     "setActiveServer",
     "startApp",
+    "setTunnel",
 ]);
 
 var settingsActions = Reflux.createActions([]);

@@ -54,7 +54,7 @@ html, body
 
     #dashboard
     {
-        padding: 0 0 10px;
+        padding: 0 10px 10px;
 
         #request_list
         {
@@ -79,6 +79,12 @@ html, body
                 font-weight: bold;
             }
 
+            #request_list_inner
+            {
+                height: calc(100vh - 180px);
+                overflow: auto;
+            }
+
             .request_list_row
             {
                 padding-top: 7px;
@@ -87,6 +93,11 @@ html, body
                 margin-bottom: 7px;
                 font-size: 15px;
                 box-shadow: unset;
+
+                .cell
+                {
+                    overflow: hidden;
+                }
 
                 .request_list_row_lower
                 {

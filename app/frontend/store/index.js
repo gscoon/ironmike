@@ -7,15 +7,18 @@ class AppStore extends Reflux.Store
 
         var appData = Handler.data.get('app');
 
+        var tunnel = Handler.api.getTunnel();
+
         var defaultApp = I.fromJS({
             requests        : [],
             activeSSH       : null,
+            ports           : null,
         });
 
         this.state = {
             hasLoaded       : false,
             latestReq       : null,
-            tunnelStatus    : false,
+            tunnelStatus    : tunnel.status,
             temp            : I.fromJS({
                 servers        : []
             }),
@@ -29,17 +32,29 @@ class AppStore extends Reflux.Store
         ];
     }
 
+    onSetTunnel(){
+        this.setState({tunnelStatus: true})
+    }
+
+    onSetPorts(data){
+        var newApp = this.state.app.set('ports', data);
+
+        // Handler.tunnel.start(config);
+        // Handler.proxy.start(config);
+
+        this.setState({app: newApp});
+        this.persist();
+    }
+
     onSetActiveServer(data){
-        this.setState({activeSSH: data});
+        var newApp = this.state.app.set('activeSSH', data);
+        this.setState({app: newApp});
+        this.persist();
     }
 
     onGetServers(){
-        var url = App.getEndpoint('/api/servers');
-        Util.get(url)
+        Handler.api.getServers()
         .then((response)=>{
-            if(!response.status)
-                return;
-
             var serverList = I.fromJS(response.servers);
             var newTemp = this.state.temp.set('servers', serverList);
             this.setState({temp: newTemp});
@@ -50,13 +65,12 @@ class AppStore extends Reflux.Store
         var latest = this.state.latestReq || this.parseLatestRequest();
         if(!latest) return;
 
-        var url = App.getEndpoint('/api/requests/' + latest.id);
-        Util.get(url)
+        Handler.api.getLatestRequests({id: latest.id})
         .then((res)=>{
             Modal.hideLoader();
-            if(!res.status || !res.data.length)
+            if(!res.data.length)
                 return;
-
+                
             console.log("New data", res.data.length);
             var newList = I.fromJS(res.data);
             var newApp = this.state.app.updateIn(['requests'], (oldList)=>{
@@ -75,17 +89,9 @@ class AppStore extends Reflux.Store
 
     onGetRequests(){
         Modal.showLoader();
-        var url = App.getEndpoint('/api/requests');
-
-        var requestList = Handler.data.get('requests');
-        requestList = _.orderBy(requestList, ['unixTimestamp'], ['desc']);
-
-        Util.get(url)
+        Handler.api.getAllRequests()
         .then((res)=>{
             Modal.hideLoader();
-            if(!res.status)
-                return;
-
             var requestList = I.fromJS(res.data);
             var newApp = this.state.app.set('requests', requestList);
             console.log('Setting requests');

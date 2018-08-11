@@ -55,7 +55,7 @@ class Dashboard extends Component {
                             <div className="col-sm-1">Delete</div>
                         </div>
                     </UI.Segment>
-                    <UI.Segment basic className="clean_segment" loading={this.state.loading}>
+                    <UI.Segment id="request_list_inner" basic className="clean_segment" loading={this.state.loading}>
                         {rows}
                     </UI.Segment>
                 </div>
@@ -104,11 +104,11 @@ class RequestRow extends Component {
         return (
             <UI.Segment className="request_list_row">
                 <div className="request_list_row_upper row">
-                    <div className="col-sm-1">{this.props.num}.</div>
-                    <div className="col-sm-2">
+                    <div className="col-sm-1 cell">{this.props.num}.</div>
+                    <div className="col-sm-2 cell">
                         <UI.Button size="tiny" content="Details" color="blue" icon={updown} onClick={this.toggleDetails.bind(this)} />
                     </div>
-                    <div className="col-sm-2">
+                    <div className="col-sm-2 cell">
                         <UI.Popup
                             trigger={timeSince}
                             position="bottom right"
@@ -116,20 +116,20 @@ class RequestRow extends Component {
                             inverted
                             />
                     </div>
-                    <div className="col-sm-1">{r.method}</div>
-                    <div className="col-sm-2">{r.hostname}</div>
-                    <div className="col-sm-2">{r.path}</div>
-                    <div className="col-sm-1">{id}</div>
-                    <div className="col-sm-1">
+                    <div className="col-sm-1 cell">{r.method}</div>
+                    <div className="col-sm-2 cell">{r.hostname}</div>
+                    <div className="col-sm-2 cell">{r.path}</div>
+                    <div className="col-sm-1 cell">{id}</div>
+                    <div className="col-sm-1 cell">
                         <UI.Button size="tiny" icon="trash" onClick={this.handleDelete.bind(this)} />
                     </div>
                 </div>
                 <UI.Segment className="request_list_row_lower" style={lowerStyle}>
                     <div className="row">
-                        <div className="col-sm-6">
+                        <div className="col-sm-6 cell">
                             <PropertiesSection title="Headers" rowID={r.id} properties={r.headers} key="props-headers" />
                         </div>
-                        <div className="col-sm-6">
+                        <div className="col-sm-6 cell">
                             <PropertiesSection title="Query" properties={r.query} key="props-query" />
                         </div>
                     </div>

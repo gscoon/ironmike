@@ -3,20 +3,25 @@ import React, {Component} from 'react';
 class Start extends Component {
     constructor(props){
         super(props);
+        var panel = 1;
+
+        if(this.props.app.activeSSH){
+            panel = 2;
+
+        }
+
         this.state = {
             hostKey     : null,
             authType    : 'password',
             counter     : 0,
             loading     : false,
-            panel       : 1,
+            panel       : panel,
         }
 
         this.forms = {
             ssh     : {},
-            ports   : {},
+            proxy   : {},
         };
-
-        this.ports = {};
 
         this.customServerKey = '==custom==';
 
@@ -68,15 +73,9 @@ class Start extends Component {
             data[key] = (ele && ele.state) ? ele.state.value : ele;
         });
 
-        var url = App.getEndpoint('/api/tunnel/check');
-        Util.post(url, data)
-        .then((response)=>{
-            if(!response.status)
-                return finished(false);
-
-            finished(true);
-        })
-        .catch(()=>finished(false));
+        Handler.api.checkTunnel(data)
+        .then(()=>finished(true))
+        .catch(()=>finished(false))
 
         function finished(status){
             self.setState({loading: false});
@@ -93,21 +92,62 @@ class Start extends Component {
     }
 
     setPorts(){
+        var self = this;
         this.setState({loading: true})
 
-        var data = {
-            done : ()=>this.setState({loading: false})
-        };
+        var data = this.getFormData('proxy');
 
-        _.each(this.forms.ports, (ele, key)=>{
-            data[key] = (ele && ele.state) ? ele.state.value : ele;
-        });
+        if(!data.remotePort)
+            return handleErr("Remote port is required.");
 
-        Actions.start.startApp(data);
+        var route = false;
+        if(data.app){
+            // destination
+            route = {destination: data.app};
+            if(data.urlMatch)
+                route.urlMatch = data.urlMatch;
+        }
+
+        var proxyConfig = {
+            routes : [route]
+        }
+
+        var tunnelConfig = {
+            remotePort: data.remotePort
+        }
+
+        Handler.api.setProxy(proxyConfig)
+        .then((config)=>{
+            tunnelConfig.proxyPort = config.port;
+            return Handler.api.setTunnel(tunnelConfig);
+        })
+        .then(()=>{
+            Toast.success("Tunnel started");
+            this.setState({loading: false})
+            Actions.start.setTunnel(tunnelConfig);
+        })
+        .catch(handleErr)
+
+        function handleErr(err){
+            console.log('Error:');
+            console.log(err);
+
+            var str = (typeof err === 'string') ? err : 'An error occurred';
+            self.setState({loading: false})
+            return Toast.error(str);
+        }
     }
 
     handleFileChange(evt){
         console.log('handleFileChange:', evt.target.files);
+    }
+
+    getFormData(which){
+        var data = {};
+        _.each(this.forms[which], (ele, key)=>{
+            data[key] = (ele && ele.state) ? ele.state.value : ele;
+        });
+        return data;
     }
 
     getCustomForm(data){
@@ -211,7 +251,7 @@ class Start extends Component {
             <UI.Container key="panel-1">
                 <UI.Header as='h2'>
                     <UI.Label circular content="1" color="blue" horizontal style={{marginLeft: 0}} />
-                    <span>Remote Server</span>
+                    <span>Remote Server Setup</span>
                     <UI.Header.Subheader>Set up your remote server connection</UI.Header.Subheader>
                 </UI.Header>
                 <UI.Segment id="start_view_inner" loading={this.state.loading}>
@@ -235,9 +275,14 @@ class Start extends Component {
                 <UI.Segment id="start_view_inner" loading={this.state.loading}>
                     <UI.Form>
                         <UI.Form.Group>
-                            <StartField required type="number" label="Remote Port" placeholder="Port Number" width={4} ref={(r)=>{this.forms.ports.remote = r}} />
-                            <StartField type="number" label="App Port" placeholder="Optional" width={4} ref={(r)=>{this.forms.ports.app = r}} />
+                            <StartField required type="number" label="Remote Port" placeholder="Port Number" width={4} ref={(r)=>{this.forms.proxy.remotePort = r}} />
                         </UI.Form.Group>
+                        <UI.Segment>
+                            <UI.Form.Group>
+                                <StartField type="input" label="App Destination" placeholder="localhost:3000" width={6} ref={(r)=>{this.forms.proxy.app = r}} />
+                                <StartField type="input" label="URL Match" placeholder="example.com" width={6} ref={(r)=>{this.forms.proxy.urlMatch = r}} />
+                            </UI.Form.Group>
+                        </UI.Segment>
                         <UI.Button content="Back" />
                         <UI.Button color="blue" type='submit' content="Start" onClick={this.setPorts.bind(this)} />
                     </UI.Form>

@@ -55,15 +55,17 @@ class AppView extends Reflux.Component {
             var content = <DashboardView requests={this.state.app.get('requests').toJS()} />
         }
         else {
-            var content = <StartView servers={this.state.temp.get('servers').toJS()} />
+            var servers = this.state.temp.get('servers').toJS();
+            var app = this.state.app.toJS();
+            var content = <StartView app={app} servers={servers} />
         }
 
         return (
             <div id="outer">
                 <Shared.Header />
-                <div id="app_wrapper" className="container">
+                <div id="app_wrapper">
                     {content}
-                    <ToastContainer position="bottom-right" autoClose={2000} />
+                    <ToastContainer position="bottom-center" autoClose={2000} />
                 </div>
             </div>
         );

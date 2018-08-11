@@ -1,62 +1,80 @@
-const tunnel        = require('reverse-tunnel-ssh');
+const Tunnel        = require('reverse-tunnel-ssh');
 const ssh2          = require('ssh2');
 const moment        = require('moment');
 const Path          = require('path');
 const fs            = require('fs');
+const _             = require('lodash');
 
 var debug = Util.getDebugger('tunnel');
 
 module.exports = {
     start       : startTunnel,
+    // test connection
     check       : checkTunnel,
     getServers  : getServers,
+    // check status
+    get         : getTunnel,
+}
+
+var tunnel = {
+    conn    : null,
+    status  : false,
+    config  : null
 }
 
 function startTunnel(config){
-    var remote = config.remote;
+    debug("Tunnel: Opening remote port", config.remotePort);
+    debug("Tunnel: Sending request to local port", config.proxyPort);
 
-    debug("Tunnel: Opening remote port", remote.listenPort);
-    debug("Tunnel: Sending request to local port", config.port);
+    var hasConnected = false;
 
-    var options = {
-        host        : remote.host,
-        username    : remote.username,
-        // dstHost     : '0.0.0.0', // bind to all IPv4 interfaces
-        dstPort     : remote.listenPort,
-        privateKey  : remote.privateKey,
-        //srcHost: '127.0.0.1', // default
-        srcPort     : config.port // default is the same as dstPort
-    };
-
-    var conn;
-
-    connect()
-    .then(()=>{
-        conn.on('error', (err) => {
-            debug.error("Tunnel error", err);
-            conn.end();
-            connect();
-        })
-    })
+    tunnel.config = config;
+    var options = getOptions(config);
+    debug(_.omit(options, ['privateKey']));
+    return connect()
 
     function connect(){
-        return clearRemotePort(remote)
-        .then(()=>{
-            conn = tunnel(options, (err, clientConnection) => {
-                if(err)
-                    debug.error(err);
-            });
+        return new Promise((resolve, reject)=>{
+            return clearRemotePort(options)
+            .then(()=>{
+                debug('Tunnel: Attempting to connect');
+                tunnel.conn = Tunnel(options, (err, clientConnection) => {
+                    debug("Tunnel - Response");
+                    if(err)
+                        return debug.error(err);
+                });
+
+                tunnel.conn.on('ready', ()=>{
+                    debug('Tunnel: Started!!!!!!!')
+
+                    tunnel.status = true;
+                    hasConnected = true;
+                    resolve();
+                })
+
+                tunnel.conn.on('error', (err) => {
+                    tunnel.status = false;
+                    debug.error("Tunnel error", err);
+                    tunnel.conn.end();
+                    connect();
+                });
+
+                tunnel.conn.on('forward-in', function (port) {
+                    debug('Forwarding from remote port:' + port);
+                });
+            })
+            .catch(reject)
         })
     }
 }
 
-function clearRemotePort(remote){
+function clearRemotePort(options){
     return new Promise((resolve, reject)=>{
         // first kill any existing services listening on port
         var conn = new ssh2.Client();
 
-        var cmd = "kill $(lsof -t -i:" + remote.listenPort +")";
-        // debug("Executing command", cmd);
+        var cmd = "kill $(lsof -t -i:" + options.dstPort +")";
+        debug("Executing command", cmd);
 
         conn.on('ready', ()=>{
             conn.exec(cmd, (err, stream)=>{
@@ -78,15 +96,15 @@ function clearRemotePort(remote){
         // disconnect and reconnet
         conn.on('error', (err) => {
             debug.error("SSH2 error", err);
+            reject(err);
         })
 
-        conn.connect({
-            host        : remote.host,
-            username    : remote.username,
-            port        : remote.port || 22,
-            privateKey  : remote.privateKey,
-        })
+        conn.connect(options)
     })
+}
+
+function getTunnel(){
+    return _.pick(tunnel, ['status', 'config'])
 }
 
 function checkTunnel(remote){
@@ -119,6 +137,12 @@ function getOptions(remote){
 
     if(remote.password)
         options.password = remote.password;
+
+    if(remote.remotePort)
+        options.dstPort = parseInt(remote.remotePort);
+
+    if(remote.proxyPort)
+        options.srcPort = parseInt(remote.proxyPort);
 
     return options;
 }

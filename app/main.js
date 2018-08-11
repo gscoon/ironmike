@@ -20,7 +20,7 @@ global.Util = require('./util.js');
 var handlerDir = Path.join(__dirname, '/handlers/');
 global.Handler = Util.getHandlers(handlerDir);
 
-require('electron-reload')([__dirname, handlerDir], {
+require('electron-reload')(__dirname, {
     // Note that the path to electron may vary according to the main file
     electron: require(`${__dirname}/../node_modules/electron`)
 });
@@ -35,32 +35,13 @@ module.exports = {
 
 app.on('ready', start);
 
-function start(config){
-    config = config || {};
-
+function start(){
     debug('App: Starting...');
-
-    // config.routes = config.routes || [];
-
     // find x free ports
     Handler.data.start()
-    .then(()=>{
-        return Promise.all([getPort(), getPort(), getPort()])
-    })
-    .then((freePorts)=>{
-        if(!config.port)
-            config.port = freePorts.pop();
-
-        if(!config.webPort)
-            config.webPort = freePorts.pop();
-
-        if(config.remote)
-            Handler.tunnel.start(config);
-
-        // Handler.proxy.start(config);
-        Handler.api.start(config.webPort)
-        .then(launchWindow);
-    })
+    .then(getPort)
+    .then(Handler.api.start)
+    .then(launchWindow)
 }
 
 function launchWindow(){

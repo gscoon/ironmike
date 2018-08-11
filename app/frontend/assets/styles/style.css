@@ -30,7 +30,7 @@ html, body {
       color: #23799b;
       cursor: pointer; }
   #app_wrapper #dashboard {
-    padding: 0 0 10px; }
+    padding: 0 10px 10px; }
     #app_wrapper #dashboard #request_list {
       padding: 0 0 10px; }
       #app_wrapper #dashboard #request_list #request_list_header {
@@ -46,6 +46,9 @@ html, body {
         font-size: 15px;
         color: #444;
         font-weight: bold; }
+      #app_wrapper #dashboard #request_list #request_list_inner {
+        height: calc(100vh - 180px);
+        overflow: auto; }
       #app_wrapper #dashboard #request_list .request_list_row {
         padding-top: 7px;
         padding-bottom: 7px;
@@ -53,6 +56,8 @@ html, body {
         margin-bottom: 7px;
         font-size: 15px;
         box-shadow: unset; }
+        #app_wrapper #dashboard #request_list .request_list_row .cell {
+          overflow: hidden; }
         #app_wrapper #dashboard #request_list .request_list_row .request_list_row_lower {
           min-height: 100px;
           margin: 10px 0 0;
