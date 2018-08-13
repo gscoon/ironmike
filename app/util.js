@@ -172,13 +172,14 @@ function customInterval(intvl, func, maxCount){
         count++;
     }, intvl);
 
-    function stop(){
+    function clear(){
         clearInterval(id);
     }
 
     return {
         count   : count,
-        stop    : stop,
+        stop    : clear,
+        clear   : clear,
         id      : id,
     }
 }

@@ -18,15 +18,16 @@ global.Main = {
     maximize    : maximize,
     unmaximize  : unmaximize,
     hideWindow  : hideWindow,
+    quit        : quit,
 }
 
 module.exports = {
     start : start,
 };
 
-global.Config   = require('./config.js');
+global.Config   = require('./backend/config.js');
 global.Util     = require('./util.js');
-global.Handler  = Util.getHandlers(Path.join(__dirname, '/handlers/'));
+global.Handler  = Util.getHandlers(Path.join(__dirname, '/backend/handlers/'));
 
 require('electron-reload')(__dirname, {
     // Note that the path to electron may vary according to the main file
@@ -80,4 +81,8 @@ function maximize(){
 
 function unmaximize(){
     BrowserWindow.getFocusedWindow().unmaximize();
+}
+
+function quit(){
+    app.quit();
 }

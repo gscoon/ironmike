@@ -6,13 +6,14 @@ class AppStore extends Reflux.Store
         super();
 
         var appData = Handler.data.get('app');
+        appData.requests = _.orderBy(appData.requests, ['unixTimestamp'], ['desc']);
 
         var tunnel = Handler.api.getTunnel();
 
         var defaultApp = I.fromJS({
             requests        : [],
-            activeSSH       : null,
-            ports           : null,
+            currentRemote      : null,
+            currentRoutes   : null,
         });
 
         this.state = {
@@ -32,22 +33,19 @@ class AppStore extends Reflux.Store
         ];
     }
 
-    onSetTunnel(){
-        this.setState({tunnelStatus: true})
-    }
-
-    onSetPorts(data){
-        var newApp = this.state.app.set('ports', data);
-
-        // Handler.tunnel.start(config);
-        // Handler.proxy.start(config);
-
+    onSetCurrentRemote(data){
+        var newApp = this.state.app.set('currentRemote', data);
         this.setState({app: newApp});
         this.persist();
     }
 
-    onSetActiveServer(data){
-        var newApp = this.state.app.set('activeSSH', data);
+    onSetTunnelStatus(status){
+        this.setState({tunnelStatus: true})
+    }
+
+    // {tunnel, proxy}
+    onSetRoutes(data){
+        var newApp = this.state.app.set('currentRoutes', data);
         this.setState({app: newApp});
         this.persist();
     }
@@ -70,7 +68,7 @@ class AppStore extends Reflux.Store
             Modal.hideLoader();
             if(!res.data.length)
                 return;
-                
+
             console.log("New data", res.data.length);
             var newList = I.fromJS(res.data);
             var newApp = this.state.app.updateIn(['requests'], (oldList)=>{

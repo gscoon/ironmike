@@ -80,9 +80,10 @@ html, body {
           background-image: url("./../images/system/windows/unmax-hover.png"); }
 
 #app_wrapper {
-  padding-top: 15px; }
+  padding-top: 0 5px 5px; }
   #app_wrapper #start_view {
-    margin: 0; }
+    margin: 0;
+    padding: 20px 0 0; }
     #app_wrapper #start_view #start_view_steps {
       margin: 0 auto 15px; }
     #app_wrapper #start_view #start_view_inner {
@@ -92,56 +93,60 @@ html, body {
     #app_wrapper #start_view .key_link {
       color: #23799b;
       cursor: pointer; }
-  #app_wrapper #dashboard {
+  #app_wrapper #dashboard_view #request_setup {
+    padding: 5px 20px;
+    margin-bottom: 5px;
+    font-size: 13px;
+    background-color: #f7cdcd; }
+  #app_wrapper #dashboard_view #request_list {
     padding: 0 10px 10px; }
-    #app_wrapper #dashboard #request_list {
-      padding: 0 0 10px; }
-      #app_wrapper #dashboard #request_list #request_list_header {
-        border: #ccc solid;
-        border-width: 0 0 1px;
-        padding-top: 7px;
-        padding-bottom: 7px;
-        margin-bottom: 7px;
-        font-weight: bold;
-        background-color: #333;
-        color: #efefef; }
-      #app_wrapper #dashboard #request_list .request_list_subheader {
-        font-size: 15px;
-        color: #444;
-        font-weight: bold; }
-      #app_wrapper #dashboard #request_list #request_list_inner {
-        height: calc(100vh - 180px);
-        overflow: auto; }
-      #app_wrapper #dashboard #request_list .request_list_row {
-        padding-top: 7px;
-        padding-bottom: 7px;
-        margin-top: 7px;
-        margin-bottom: 7px;
-        font-size: 15px;
-        box-shadow: unset; }
-        #app_wrapper #dashboard #request_list .request_list_row .cell {
-          overflow: hidden; }
-        #app_wrapper #dashboard #request_list .request_list_row .request_list_row_lower {
-          min-height: 100px;
-          margin: 10px 0 0;
-          display: none; }
-        #app_wrapper #dashboard #request_list .request_list_row .property_section {
-          margin: 0 0 15px;
-          padding: 10px;
-          overflow: hidden; }
-          #app_wrapper #dashboard #request_list .request_list_row .property_section .property_section_inner {
-            border: #999 solid;
-            border-width: 1px 0 0;
-            padding: 5px 0; }
-          #app_wrapper #dashboard #request_list .request_list_row .property_section .property_section_title {
-            font-size: 14px;
-            padding: 0 0 5px;
+    #app_wrapper #dashboard_view #request_list #request_list_header {
+      border: 0;
+      padding-top: 5px;
+      padding-bottom: 5px;
+      margin-bottom: 0;
+      background-color: #444;
+      color: #fff;
+      font-size: 14px;
+      border-radius: 5px 5px 0 0; }
+    #app_wrapper #dashboard_view #request_list .request_list_subheader {
+      font-size: 15px;
+      color: #444;
+      font-weight: bold; }
+    #app_wrapper #dashboard_view #request_list #request_list_inner {
+      height: calc(100vh - 170px);
+      overflow: auto;
+      background-color: #fff; }
+    #app_wrapper #dashboard_view #request_list .request_list_row {
+      padding-top: 5px;
+      padding-bottom: 5px;
+      margin: 0;
+      border: 0;
+      box-shadow: unset; }
+      #app_wrapper #dashboard_view #request_list .request_list_row .cell {
+        overflow: hidden;
+        font-size: 13px; }
+      #app_wrapper #dashboard_view #request_list .request_list_row .request_list_row_lower {
+        min-height: 100px;
+        margin: 10px 0 0;
+        display: none; }
+      #app_wrapper #dashboard_view #request_list .request_list_row .property_section {
+        margin: 0 0 15px;
+        padding: 10px;
+        overflow: hidden; }
+        #app_wrapper #dashboard_view #request_list .request_list_row .property_section .property_section_inner {
+          border: #999 solid;
+          border-width: 1px 0 0;
+          padding: 5px 0; }
+        #app_wrapper #dashboard_view #request_list .request_list_row .property_section .property_section_title {
+          font-size: 14px;
+          padding: 0 0 5px;
+          font-weight: bold; }
+        #app_wrapper #dashboard_view #request_list .request_list_row .property_section .property_row {
+          font-size: 13px; }
+          #app_wrapper #dashboard_view #request_list .request_list_row .property_section .property_row .property_key {
+            padding: 0 10px 0 0;
             font-weight: bold; }
-          #app_wrapper #dashboard #request_list .request_list_row .property_section .property_row {
-            font-size: 13px; }
-            #app_wrapper #dashboard #request_list .request_list_row .property_section .property_row .property_key {
-              padding: 0 10px 0 0;
-              font-weight: bold; }
   #app_wrapper .fields .disabled {
     opacity: 1; }
     #app_wrapper .fields .disabled .input {

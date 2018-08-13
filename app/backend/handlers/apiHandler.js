@@ -22,9 +22,9 @@ module.exports = {
     deleteRequests      : deleteRequests,
     getServers          : getServers,
     checkTunnel         : checkTunnel,
-    setTunnel           : setTunnel,
+    startTunnel         : startTunnel,
     getTunnel           : getTunnel,
-    setProxy            : setProxy,
+    startProxy            : startProxy,
 }
 
 app.use(customMiddleware);
@@ -44,11 +44,11 @@ app.get('/api/servers', rh.bind(getServers));
 
 // Tunnel
 app.post('/api/tunnel/check', rh.bind(checkTunnel));
-app.post('/api/tunnel', rh.bind(setTunnel));
+app.post('/api/tunnel', rh.bind(startTunnel));
 app.get('/api/tunnel', rh.bind(getTunnel));
 
 // Proxy
-app.post('/api/proxy', rh.bind(setProxy));
+app.post('/api/proxy', rh.bind(startProxy));
 
 app.all('*', (req, res)=>res.status(404).send({status: false, code: 404}));
 
@@ -74,7 +74,7 @@ function rh(req, res){
     })
 }
 
-function setProxy(data){
+function startProxy(data){
     return Handler.proxy.start(data)
 }
 
@@ -88,7 +88,6 @@ function getLatestRequests(body){
     var requests = Handler.data.get('app.requests');
     requests = _.orderBy(requests, ['unixTimestamp'], ['desc']);
     var latestID = body.id;
-    debug('Getting latest', body);
     var item = _.find(requests, {id: latestID});
 
     if(!item)
@@ -125,8 +124,8 @@ function getTunnel(body){
     return tunnel
 }
 
-function setTunnel(body){
-    var remote = Handler.data.get('app.activeSSH');
+function startTunnel(body){
+    var remote = Handler.data.get('app.currentRemote');
     if(!remote)
         return Promise.reject('Missing active SSH');
 

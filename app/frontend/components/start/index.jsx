@@ -5,9 +5,14 @@ class Start extends Component {
         super(props);
         var panel = 1;
 
-        if(this.props.app.activeSSH){
+        var appData = this.props.app;
+
+        if(appData.currentRemote){
             panel = 2;
 
+            if(appData.currentRoutes){
+                panel = 3;
+            }
         }
 
         this.state = {
@@ -80,7 +85,7 @@ class Start extends Component {
         function finished(status){
             self.setState({loading: false});
             if(status){
-                Actions.start.setActiveServer(data);
+                Actions.start.setCurrentRemote(data);
                 self.setState({panel: 2});
                 Toast.success("Connection successful.");
             }
@@ -90,10 +95,7 @@ class Start extends Component {
         }
     }
 
-    setPorts(){
-        var self = this;
-        this.setState({loading: true})
-
+    setRoutes(){
         var data = this.getFormData('proxy');
 
         if(!data.remotePort)
@@ -115,15 +117,31 @@ class Start extends Component {
             remotePort: data.remotePort
         }
 
-        Handler.api.setProxy(proxyConfig)
+        this.startRouting({
+            proxy   : proxyConfig,
+            tunnel  : tunnelConfig,
+        })
+    }
+
+    connect(){
+        var appData = this.props.app;
+        this.startRouting(appData.currentRoutes)
+    }
+
+    startRouting(routing){
+        var self = this;
+        this.setState({loading: true})
+
+        return Handler.api.startProxy(routing.proxy)
         .then((config)=>{
-            tunnelConfig.proxyPort = config.port;
-            return Handler.api.setTunnel(tunnelConfig);
+            routing.tunnel.proxyPort = config.port;
+            return Handler.api.startTunnel(routing.tunnel);
         })
         .then(()=>{
             Toast.success("Tunnel started");
             this.setState({loading: false})
-            Actions.start.setTunnel(tunnelConfig);
+            Actions.start.setTunnelStatus(true);
+            Actions.start.setRoutes(routing);
         })
         .catch(handleErr)
 
@@ -283,20 +301,39 @@ class Start extends Component {
                             </UI.Form.Group>
                         </UI.Segment>
                         <UI.Button content="Back" />
-                        <UI.Button color="blue" type='submit' content="Start" onClick={this.setPorts.bind(this)} />
+                        <UI.Button color="blue" type='submit' content="Start" onClick={this.setRoutes.bind(this)} />
                     </UI.Form>
                 </UI.Segment>
             </UI.Container>
         );
     }
 
+    getPanel3(){
+        var appData = this.props.app;
+        return (
+            <UI.Container key="panel-3">
+                <Shared.CurrentSetup remote={appData.currentRemote} routes={appData.currentRoutes} />
+                <UI.Segment id="start_view_inner" loading={this.state.loading}>
+                    <UI.Button content="Connect" onClick={this.connect.bind(this)} />
+                </UI.Segment>
+            </UI.Container>
+        )
+    }
+
     render(){
         var panel = null;
 
-        if(this.state.panel === 1)
-            panel = this.getPanel1();
-        else if(this.state.panel === 2)
-            panel = this.getPanel2();
+        switch(this.state.panel){
+            case 1:
+                panel = this.getPanel1();
+                break;
+            case 2:
+                panel = this.getPanel2();
+                break;
+            case 3:
+                panel = this.getPanel3();
+                break;
+        }
 
         // <UI.Message warning visible={true} header="SSH Setup" content="Provide your ssh details below:" />
         // <Shared.Steps />

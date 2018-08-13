@@ -4,7 +4,7 @@ import ReactJson from 'react-json-view'
 class Dashboard extends Component {
     constructor(props){
         super(props);
-        Util.wait().then(Actions.dashboard.getRequests);
+        // Util.wait().then(Actions.dashboard.getRequests);
 
         Util.waitasec(1)
         .then(()=>{
@@ -27,7 +27,8 @@ class Dashboard extends Component {
     }
 
     render(){
-        var requests = this.props.requests;
+        var appData = this.props.app;
+        var requests = appData.requests;
         var perChunk = 10;
         var chunks = _.chunk(requests, perChunk);
         var rows = null;
@@ -41,7 +42,8 @@ class Dashboard extends Component {
             });
 
         return (
-            <div id="dashboard">
+            <div id="dashboard_view">
+                <Shared.CurrentSetup remote={appData.currentRemote} routes={appData.currentRoutes} />
                 <div id="request_list">
                     <UI.Segment id="request_list_header">
                         <div className="row">
@@ -74,9 +76,16 @@ class RequestRow extends Component {
         };
 
         // every 10 seconds
-        var obj = Util.interval(10 * 1000, ()=>{
+        this.interval = Util.interval(10 * 1000, ()=>{
             this.setState({counter: this.state.counter + 1})
         });
+    }
+
+    componentWillUnmount(){
+        if(this.interval){
+            console.log(this.interval);
+            this.interval.clear();
+        }
     }
 
     handleDelete(){
@@ -106,7 +115,7 @@ class RequestRow extends Component {
                 <div className="request_list_row_upper row">
                     <div className="col-sm-1 cell">{this.props.num}.</div>
                     <div className="col-sm-2 cell">
-                        <UI.Button size="tiny" content="Details" color="blue" icon={updown} onClick={this.toggleDetails.bind(this)} />
+                        <UI.Button size="mini" content="Details" color="blue" icon={updown} onClick={this.toggleDetails.bind(this)} />
                     </div>
                     <div className="col-sm-2 cell">
                         <UI.Popup
@@ -121,7 +130,7 @@ class RequestRow extends Component {
                     <div className="col-sm-2 cell">{r.path}</div>
                     <div className="col-sm-1 cell">{id}</div>
                     <div className="col-sm-1 cell">
-                        <UI.Button size="tiny" icon="trash" onClick={this.handleDelete.bind(this)} />
+                        <UI.Button size="mini" icon="trash" onClick={this.handleDelete.bind(this)} />
                     </div>
                 </div>
                 <UI.Segment className="request_list_row_lower" style={lowerStyle}>

@@ -2,13 +2,14 @@
 
 const {remote, ipcRenderer} = require('electron');
 
-import React, {Component} from 'react';
-import { ToastContainer, toast } from 'react-toastify';
-
+const React     = require('react');
+const {Component} = React;
 const Reflux    = require('reflux');
 const ReactDOM  = require('react-dom');
 const swal      = require('sweetalert2');
 const events    = require('events');
+
+const { ToastContainer, toast } = require('react-toastify');
 
 window.App      = new events.EventEmitter();
 
@@ -16,21 +17,22 @@ Object.assign(window, {
     Handler     : remote.getGlobal("Handler"),
     Main        : remote.getGlobal("Main"),
     Actions     : require('./actions/'),
-    Util        : require('./frontend.util.js'),
+    Util        : require('./../util.js'),
     UI          : require('semantic-ui-react'),
-    Modal       : getModal(),
     moment      : require('moment'),
     Toast       : toast,
     I           : require('immutable'),
     _           : require('lodash'),
+    Modal       : getModal(),
 })
 
-window.AppStore = require('./store/');
-
+// attach to App
 Object.assign(App, {
     apiHost         : Handler.api.getHost(),
     getEndpoint     : getEndpoint,
 });
+
+window.AppStore = require('./store/');
 
 window.Shared = require('./components/shared/index.jsx');
 
@@ -52,12 +54,13 @@ class AppView extends Reflux.Component {
     }
 
     render(){
+        var app = this.state.app.toJS();
+
         if(this.state.tunnelStatus){
-            var content = <DashboardView requests={this.state.app.get('requests').toJS()} />
+            var content = <DashboardView app={app} />
         }
         else {
             var servers = this.state.temp.get('servers').toJS();
-            var app = this.state.app.toJS();
             var content = <StartView app={app} servers={servers} />
         }
 

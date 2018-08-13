@@ -37,6 +37,10 @@ class Header extends Component {
         this.update();
     }
 
+    quit(){
+        Main.quit();
+    }
+
     unmaximize(){
         Main.unmaximize();
         this.update();
@@ -60,7 +64,7 @@ class Header extends Component {
                     <div id="window-controls">
                         <a data-control="min" className="window-control" onClick={this.minimize.bind(this)}></a>
                         {maxEle}
-                        <a data-control="close" className="window-control" onClick={this.hideWindow.bind(this)}></a>
+                        <a data-control="close" className="window-control" onClick={this.quit.bind(this)}></a>
                     </div>
                     <div className="edge" id="edge-left" />
                     <div className="edge" id="edge-right" />

@@ -11,9 +11,10 @@ var dashboardActions = Reflux.createActions([
 var startActions = Reflux.createActions([
     "getServers",
     "checkTunnel",
-    "setActiveServer",
+    "setCurrentRemote",
     "startApp",
-    "setTunnel",
+    "setTunnelStatus",
+    "setRoutes",
 ]);
 
 var settingsActions = Reflux.createActions([]);
