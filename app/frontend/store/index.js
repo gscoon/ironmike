@@ -12,7 +12,7 @@ class AppStore extends Reflux.Store
 
         var defaultApp = I.fromJS({
             requests        : [],
-            currentRemote      : null,
+            currentRemote   : null,
             currentRoutes   : null,
         });
 
@@ -85,6 +85,15 @@ class AppStore extends Reflux.Store
         // console.log('Getting latest request', latest);
     }
 
+    onDisconnect(){
+        console.log("Disconnecting...");
+        Handler.api.stopTunnel();
+        Handler.api.stopProxy();
+        var newApp = this.state.app.set('currentRoutes', null);
+        this.setState({app: newApp, tunnelStatus: false});
+        this.persist();
+    }
+
     onGetRequests(){
         Modal.showLoader();
         Handler.api.getAllRequests()
@@ -121,10 +130,6 @@ class AppStore extends Reflux.Store
             Toast.error("An error occurred.");
             Modal.hideLoader();
         })
-    }
-
-    onSetSSH(data){
-
     }
 
     parseLatestRequest(){

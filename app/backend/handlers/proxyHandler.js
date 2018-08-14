@@ -11,8 +11,11 @@ const getPort       = require('get-port');
 var debug = Util.getDebugger('proxy');
 
 module.exports = {
-    start : startProxy,
+    start   : startProxy,
+    stop    : stopProxy,
 }
+
+var http;
 
 function startProxy(config){
     return getPort()
@@ -23,6 +26,14 @@ function startProxy(config){
     })
 }
 
+function stopProxy(){
+    if(!http)
+        return;
+
+    debug('Stopping Proxy/HTTP connection');    
+    http.close();
+}
+
 function setProxy(config){
     debug("Set proxy", config)
     var proxy = rocky();
@@ -30,7 +41,7 @@ function setProxy(config){
     app.use(bodyParser.json());
     app.use(bodyParser.urlencoded({ extended: true }));
 
-    var http = require('http').Server(app);
+    http = require('http').Server(app);
 
     http.listen(config.port, ()=>{
         debug('Proxy: Listening on port:', config.port);

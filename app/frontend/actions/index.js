@@ -6,6 +6,7 @@ var dashboardActions = Reflux.createActions([
     "getRequests",
     "deleteRequest",
     "getRequests",
+    "disconnect"
 ]);
 
 var startActions = Reflux.createActions([

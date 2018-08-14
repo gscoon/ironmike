@@ -23,8 +23,10 @@ module.exports = {
     getServers          : getServers,
     checkTunnel         : checkTunnel,
     startTunnel         : startTunnel,
+    stopTunnel          : stopTunnel,
     getTunnel           : getTunnel,
-    startProxy            : startProxy,
+    startProxy          : startProxy,
+    stopProxy           : stopProxy,
 }
 
 app.use(customMiddleware);
@@ -45,10 +47,12 @@ app.get('/api/servers', rh.bind(getServers));
 // Tunnel
 app.post('/api/tunnel/check', rh.bind(checkTunnel));
 app.post('/api/tunnel', rh.bind(startTunnel));
+app.delete('/api/tunnel', rh.bind(stopTunnel));
 app.get('/api/tunnel', rh.bind(getTunnel));
 
 // Proxy
 app.post('/api/proxy', rh.bind(startProxy));
+app.delete('/api/proxy', rh.bind(stopProxy));
 
 app.all('*', (req, res)=>res.status(404).send({status: false, code: 404}));
 
@@ -74,8 +78,12 @@ function rh(req, res){
     })
 }
 
-function startProxy(data){
-    return Handler.proxy.start(data)
+function startProxy(body){
+    return Handler.proxy.start(body)
+}
+
+function stopProxy(body){
+    return Handler.proxy.stop()
 }
 
 function getAllRequests(body){
@@ -131,6 +139,10 @@ function startTunnel(body){
 
     Object.assign(remote, body)
     return Handler.tunnel.start(remote);
+}
+
+function stopTunnel(body){
+    Handler.tunnel.stop();
 }
 
 function getHost(){

@@ -14,6 +14,7 @@ module.exports = {
     getServers  : getServers,
     // check status
     get         : getTunnel,
+    stop        : stopTunnel,
 }
 
 var tunnel = {
@@ -66,6 +67,15 @@ function startTunnel(config){
             .catch(reject)
         })
     }
+}
+
+function stopTunnel(){
+    if(!tunnel.conn)
+        return;
+
+    debug('Stopping tunnel connection');
+    tunnel.conn.end();
+    tunnel.status = false;
 }
 
 function clearRemotePort(options){

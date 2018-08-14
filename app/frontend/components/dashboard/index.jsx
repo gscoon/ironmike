@@ -22,8 +22,15 @@ class Dashboard extends Component {
         this.setState({loading: true})
         Util.wait(500)
         .then(()=>{
-            this.setState({activePage: data.activePage, loading: false});
+            this.setState({
+                activePage  : data.activePage,
+                loading     : false
+            });
         })
+    }
+
+    disconnect(){
+        Actions.dashboard.disconnect();
     }
 
     render(){
@@ -43,7 +50,6 @@ class Dashboard extends Component {
 
         return (
             <div id="dashboard_view">
-                <Shared.CurrentSetup remote={appData.currentRemote} routes={appData.currentRoutes} />
                 <div id="request_list">
                     <UI.Segment id="request_list_header">
                         <div className="row">
@@ -60,8 +66,9 @@ class Dashboard extends Component {
                     <UI.Segment id="request_list_inner" basic className="clean_segment" loading={this.state.loading}>
                         {rows}
                     </UI.Segment>
+                    <UI.Pagination defaultActivePage={this.state.activePage} totalPages={chunks.length} onPageChange={this.handlePageChange.bind(this)} />
                 </div>
-                <UI.Pagination defaultActivePage={this.state.activePage} totalPages={chunks.length} onPageChange={this.handlePageChange.bind(this)} />
+                <Shared.CurrentSetup button="Disconnect" remote={appData.currentRemote} routes={appData.currentRoutes} onBack={this.disconnect.bind(this)} />
             </div>
         )
     }

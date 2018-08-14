@@ -3,24 +3,13 @@ import React, {Component} from 'react';
 class Start extends Component {
     constructor(props){
         super(props);
-        var panel = 1;
 
-        var appData = this.props.app;
-
-        if(appData.currentRemote){
-            panel = 2;
-
-            if(appData.currentRoutes){
-                panel = 3;
-            }
-        }
 
         this.state = {
             hostKey     : null,
             authType    : 'password',
             counter     : 0,
             loading     : false,
-            panel       : panel,
         }
 
         this.forms = {
@@ -31,6 +20,23 @@ class Start extends Component {
         this.customServerKey = '==custom==';
 
         Util.wait().then(Actions.start.getServers);
+    }
+
+    static getDerivedStateFromProps(nextProps, prevState) {
+
+        var panel = 1;
+
+        var appData = nextProps.app;
+
+        if(appData.currentRemote){
+            panel = 2;
+
+            if(appData.currentRoutes){
+                panel = 3;
+            }
+        }
+
+        return {panel : panel}
     }
 
     handleHostChange(evt, data){
@@ -131,6 +137,7 @@ class Start extends Component {
     startRouting(routing){
         var self = this;
         this.setState({loading: true})
+        Actions.start.setRoutes(routing);
 
         return Handler.api.startProxy(routing.proxy)
         .then((config)=>{
@@ -141,7 +148,6 @@ class Start extends Component {
             Toast.success("Tunnel started");
             this.setState({loading: false})
             Actions.start.setTunnelStatus(true);
-            Actions.start.setRoutes(routing);
         })
         .catch(handleErr)
 
@@ -153,6 +159,10 @@ class Start extends Component {
             self.setState({loading: false})
             return Toast.error(str);
         }
+    }
+
+    setPanel(num){
+        this.setState({panel: num})
     }
 
     handleFileChange(evt){
@@ -312,9 +322,14 @@ class Start extends Component {
         var appData = this.props.app;
         return (
             <UI.Container key="panel-3">
-                <Shared.CurrentSetup remote={appData.currentRemote} routes={appData.currentRoutes} />
                 <UI.Segment id="start_view_inner" loading={this.state.loading}>
-                    <UI.Button content="Connect" onClick={this.connect.bind(this)} />
+                    <UI.Header as='h2' dividing>
+                        Reconnect
+                        <UI.Header.Subheader>Click the button below to start the tunnel</UI.Header.Subheader>
+                    </UI.Header>
+                    <Shared.CurrentSetup remote={appData.currentRemote} routes={appData.currentRoutes} onBack={this.setPanel.bind(this, 1)} />
+                    <UI.Divider />
+                    <UI.Button content="Connect" color="blue" onClick={this.connect.bind(this)} />
                 </UI.Segment>
             </UI.Container>
         )

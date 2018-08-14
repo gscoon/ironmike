@@ -177,20 +177,35 @@ html, body
         }
     }
 
+    .flex_center
+    {
+        display: flex;
+        display: flex;
+        align-items: center;
+    }
+
+    #request_setup
+    {
+        padding: 5px 20px;
+        font-size: 13px;
+
+    }
+
     #dashboard_view
     {
 
         #request_setup
         {
-            padding: 5px 20px;
-            margin-bottom: 5px;
-            font-size: 13px;
-            background-color: #f7cdcd;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: #a5a5a5;
         }
 
         #request_list
         {
-            padding: 0 10px 10px;
+            padding: 10px;
 
             #request_list_header
             {
@@ -203,7 +218,7 @@ html, body
                 background-color: #444;
                 color: #fff;
                 font-size: 14px;
-                border-radius: 5px 5px 0 0;
+                border-radius: 3px 3px 0 0;
             }
 
             .request_list_subheader
@@ -215,9 +230,10 @@ html, body
 
             #request_list_inner
             {
-                height: calc(100vh - 170px);
+                height: calc(100vh - 200px);
                 overflow: auto;
                 background-color: #fff;
+                margin-bottom: 10px;
             }
 
             .request_list_row
@@ -232,6 +248,8 @@ html, body
                 {
                     overflow: hidden;
                     font-size: 13px;
+                    align-items: center;
+                    display: flex;
                 }
 
                 .request_list_row_lower
