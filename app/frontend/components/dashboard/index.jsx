@@ -90,7 +90,6 @@ class RequestRow extends Component {
 
     componentWillUnmount(){
         if(this.interval){
-            console.log(this.interval);
             this.interval.clear();
         }
     }

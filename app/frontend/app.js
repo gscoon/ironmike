@@ -56,8 +56,6 @@ class AppView extends Reflux.Component {
     render(){
         var app = this.state.app.toJS();
 
-        console.log(this.state.tunnelStatus);
-
         if(app.currentRoutes && this.state.tunnelStatus){
             var content = <DashboardView app={app} />
         }

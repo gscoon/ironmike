@@ -23,7 +23,6 @@ class Start extends Component {
     }
 
     static getDerivedStateFromProps(nextProps, prevState) {
-
         var panel = 1;
 
         var appData = nextProps.app;
@@ -36,7 +35,7 @@ class Start extends Component {
             }
         }
 
-        return {panel : panel}
+        return {panel: panel}
     }
 
     handleHostChange(evt, data){
@@ -92,7 +91,6 @@ class Start extends Component {
             self.setState({loading: false});
             if(status){
                 Actions.start.setCurrentRemote(data);
-                self.setState({panel: 2});
                 Toast.success("Connection successful.");
             }
             else {
@@ -129,6 +127,15 @@ class Start extends Component {
         })
     }
 
+    unsetRoutes(){
+        Actions.start.setRoutes(null);
+    }
+
+    unsetRemote(){
+        // unsets routes also
+        Actions.start.setCurrentRemote(null);
+    }
+
     connect(){
         var appData = this.props.app;
         this.startRouting(appData.currentRoutes)
@@ -159,10 +166,6 @@ class Start extends Component {
             self.setState({loading: false})
             return Toast.error(str);
         }
-    }
-
-    setPanel(num){
-        this.setState({panel: num})
     }
 
     handleFileChange(evt){
@@ -327,7 +330,7 @@ class Start extends Component {
                         Reconnect
                         <UI.Header.Subheader>Click the button below to start the tunnel</UI.Header.Subheader>
                     </UI.Header>
-                    <Shared.CurrentSetup remote={appData.currentRemote} routes={appData.currentRoutes} onBack={this.setPanel.bind(this, 1)} />
+                    <Shared.CurrentSetup remote={appData.currentRemote} routes={appData.currentRoutes} onBack={this.unsetRemote.bind(this)} />
                     <UI.Divider />
                     <UI.Button content="Connect" color="blue" onClick={this.connect.bind(this)} />
                 </UI.Segment>

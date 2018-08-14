@@ -34,7 +34,12 @@ class AppStore extends Reflux.Store
     }
 
     onSetCurrentRemote(data){
-        var newApp = this.state.app.set('currentRemote', data);
+        // default to resetting currentRoutes also
+        var newApp = this.state.app.merge({
+            currentRemote   : data,
+            currentRoutes   : null,
+        });
+
         this.setState({app: newApp});
         this.persist();
     }
