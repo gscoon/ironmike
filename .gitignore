@@ -4,3 +4,4 @@ yarn-error.log
 test.js
 tests/**
 tests/
+app/.env

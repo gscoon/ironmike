@@ -1,5 +1,5 @@
 html, body {
-  background-color: #efefef !important;
+  background-color: #dcdcdc !important;
   padding: 0;
   margin: 0; }
 
@@ -105,7 +105,8 @@ html, body {
     bottom: 0;
     left: 0;
     width: 100%;
-    background-color: #a5a5a5; }
+    background-color: #fff;
+    box-shadow: 0px 0px 5px 0px rgba(0, 0, 0, 0.75); }
   #app_wrapper #dashboard_view #request_list {
     padding: 10px; }
     #app_wrapper #dashboard_view #request_list #request_list_header {
@@ -123,13 +124,13 @@ html, body {
       font-weight: bold; }
     #app_wrapper #dashboard_view #request_list #request_list_inner {
       height: calc(100vh - 200px);
-      overflow: auto;
-      background-color: #fff;
+      overflow-y: auto;
+      overflow-x: hidden;
       margin-bottom: 10px; }
     #app_wrapper #dashboard_view #request_list .request_list_row {
       padding-top: 5px;
       padding-bottom: 5px;
-      margin: 0;
+      margin: 4px 0;
       border: 0;
       box-shadow: unset; }
       #app_wrapper #dashboard_view #request_list .request_list_row .cell {
@@ -169,6 +170,15 @@ html, body {
   margin: 0;
   padding: 0;
   border: 0; }
+
+#app_sidebar {
+  padding-top: 15px;
+  z-index: 99999999;
+  top: 45px;
+  text-align: left;
+  font-size: 13px; }
+  #app_sidebar .item {
+    line-height: 18px; }
 
 /*!
  * Bootstrap Grid v4.1.2 (https://getbootstrap.com/)

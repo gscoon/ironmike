@@ -71,6 +71,7 @@ class Header extends Component {
                     <div className="edge" id="edge-top" />
                 </div>
                 <UI.Sidebar id="app_sidebar" className="nondraggable" as={UI.Menu} animation='overlay' inverted vertical visible={this.state.sidebarVisible} width="thin">
+                    <UI.Menu.Item content="Quit" onClick={this.quit.bind(this)} />
                 </UI.Sidebar>
             </div>
         );

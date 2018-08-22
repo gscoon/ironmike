@@ -63,6 +63,14 @@ function startTunnel(config){
                 tunnel.conn.on('forward-in', function (port) {
                     debug('Forwarding from remote port:' + port);
                 });
+
+                tunnel.conn.on('end', ()=>{
+                    debug.error("Tunnel ended");
+                })
+
+                tunnel.conn.on('closed', (hadError)=>{
+                    debug.error("Tunnel closed:", hadError);
+                })
             })
             .catch(reject)
         })

@@ -69,6 +69,8 @@ class Start extends Component {
     }
 
     doFocus(){
+        console.log("Do fucusing", !!this.focusable);
+
         if(this.focusable)
             this.focusable.focus();
     }
@@ -309,7 +311,7 @@ class Start extends Component {
                         </UI.Form.Group>
                         <UI.Segment>
                             <UI.Form.Group>
-                                <StartField type="input" label="App Destination" placeholder="localhost:3000" width={6} ref={(r)=>{this.forms.proxy.app = r}} />
+                                <StartField type="input" label="App Destination" placeholder="http://localhost:3000" width={6} ref={(r)=>{this.forms.proxy.app = r}} />
                                 <StartField type="input" label="URL Match" placeholder="example.com" width={6} ref={(r)=>{this.forms.proxy.urlMatch = r}} />
                             </UI.Form.Group>
                         </UI.Segment>

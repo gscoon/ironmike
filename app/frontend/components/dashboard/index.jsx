@@ -36,8 +36,8 @@ class Dashboard extends Component {
     render(){
         var appData = this.props.app;
         var requests = appData.requests;
-        var perChunk = 10;
-        var chunks = _.chunk(requests, perChunk);
+        var chunkSize = 8;
+        var chunks = _.chunk(requests, chunkSize);
         var rows = null;
 
         var chunkIndex = this.state.activePage - 1;
@@ -45,8 +45,15 @@ class Dashboard extends Component {
         if(chunks.length)
             rows = chunks[chunkIndex].map((r, index)=>{
                 var k = r.id || Util.genID(3);
-                return <RequestRow request={r} num={chunkIndex*perChunk + (index+1)} key={k} />
+                return <RequestRow request={r} num={chunkIndex*chunkSize + (index+1)} key={k} />
             });
+
+        var pagi = {
+            first       : (this.state.activePage === 1) ? null : '«',
+            previous    : (this.state.activePage === 1) ? null : '⟨',
+            last        : (this.state.activePage === chunks.length) ? null : '»',
+            next        : (this.state.activePage === chunks.length) ? null : '⟩',
+        }
 
         return (
             <div id="dashboard_view">
@@ -66,7 +73,14 @@ class Dashboard extends Component {
                     <UI.Segment id="request_list_inner" basic className="clean_segment" loading={this.state.loading}>
                         {rows}
                     </UI.Segment>
-                    <UI.Pagination defaultActivePage={this.state.activePage} totalPages={chunks.length} onPageChange={this.handlePageChange.bind(this)} />
+                    <UI.Pagination
+                        firstItem={pagi.first}
+                        prevItem={pagi.previous}
+                        lastItem={pagi.last}
+                        defaultActivePage={this.state.activePage}
+                        totalPages={chunks.length}
+                        onPageChange={this.handlePageChange.bind(this)}
+                        />
                 </div>
                 <Shared.CurrentSetup button="Disconnect" remote={appData.currentRemote} routes={appData.currentRoutes} onBack={this.disconnect.bind(this)} />
             </div>
@@ -141,10 +155,10 @@ class RequestRow extends Component {
                 </div>
                 <UI.Segment className="request_list_row_lower" style={lowerStyle}>
                     <div className="row">
-                        <div className="col-sm-6 cell">
+                        <div className="col-sm-6">
                             <PropertiesSection title="Headers" rowID={r.id} properties={r.headers} key="props-headers" />
                         </div>
-                        <div className="col-sm-6 cell">
+                        <div className="col-sm-6">
                             <PropertiesSection title="Query" properties={r.query} key="props-query" />
                         </div>
                     </div>

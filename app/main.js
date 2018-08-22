@@ -1,7 +1,8 @@
-require('dotenv').config();
+const Path          = require('path');
+
+require('dotenv').config({path: Path.join(__dirname, ".env")});
 
 const electron      = require('electron');
-const Path          = require('path');
 const fs            = require('fs');
 const moment        = require('moment');
 const getPort       = require('get-port');
