@@ -30,13 +30,13 @@ function stopProxy(){
     if(!http)
         return;
 
-    debug('Stopping Proxy/HTTP connection');    
+    debug('Stopping Proxy/HTTP connection');
     http.close();
 }
 
 function setProxy(config){
     debug("Set proxy", config)
-    var proxy = rocky();
+
     var app = express();
     app.use(bodyParser.json());
     app.use(bodyParser.urlencoded({ extended: true }));
@@ -47,11 +47,14 @@ function setProxy(config){
         debug('Proxy: Listening on port:', config.port);
     });
 
+    var proxy = rocky();
     app.use(proxy.middleware());
 
     var routes = config.routes;
 
-    var proxyRoute = proxy.all('/*');
+    var proxyRoute = proxy.options({
+        secure  : false, // Fixme: should be set in frontend
+    }).all('/*');
 
     proxyRoute.use((req, res, next)=>{
         var url = getFullURL(req);
