@@ -4,12 +4,12 @@ class Start extends Component {
     constructor(props){
         super(props);
 
-
         this.state = {
             hostKey     : null,
             authType    : 'password',
             counter     : 0,
             loading     : false,
+            force2      : false,
         }
 
         this.forms = {
@@ -30,7 +30,7 @@ class Start extends Component {
         if(appData.currentRemote){
             panel = 2;
 
-            if(appData.currentRoutes){
+            if(appData.currentRoutes && !prevState.force2){
                 panel = 3;
             }
         }
@@ -73,6 +73,15 @@ class Start extends Component {
 
         if(this.focusable)
             this.focusable.focus();
+    }
+
+    setPanel(num, extra){
+        console.log("Setting panel", num);
+        var data = {panel: num};
+        if(extra)
+            Object.assign(data, extra);
+
+        this.setState(data)
     }
 
     checkTunnel(){
@@ -145,7 +154,10 @@ class Start extends Component {
 
     startRouting(routing){
         var self = this;
-        this.setState({loading: true})
+        this.setState({
+            loading     : true,
+            force2      : false,
+        })
         Actions.start.setRoutes(routing);
 
         return Handler.api.startProxy(routing.proxy)
@@ -232,8 +244,8 @@ class Start extends Component {
             <div>
                 <UI.Divider clearing />
                 <UI.Form.Group>
-                    <StartField disabled={!!fields.host}  value={fields.host} label='Host' placeholder='Host' width={11} ref={(r)=>{this.forms.ssh.host = r}} />
-                    <StartField disabled={!!fields.port} value={fields.port} label='Port' placeholder='Port' width={5} ref={(r)=>{this.forms.ssh.port = r}} />
+                    <StartField disabled={!!fields.host}  default={fields.host} label='Host' placeholder='Host' width={11} ref={(r)=>{this.forms.ssh.host = r}} />
+                    <StartField disabled={!!fields.port} default={fields.port} label='Port' placeholder='Port' width={5} ref={(r)=>{this.forms.ssh.port = r}} />
                 </UI.Form.Group>
                 <UI.Divider clearing />
                 <UI.Form.Group inline>
@@ -253,7 +265,7 @@ class Start extends Component {
                 </UI.Form.Group>
                 <UI.Divider clearing />
                 <UI.Form.Group widths={"equal"}>
-                    <StartField width={8} disabled={!!fields.username} value={fields.username} fluid label='Username' placeholder='Username' ref={(r)=>{this.forms.ssh.username = r}} />
+                    <StartField width={8} disabled={!!fields.username} default={fields.username} fluid label='Username' placeholder='Username' ref={(r)=>{this.forms.ssh.username = r}} />
                     {authField}
                 </UI.Form.Group>
                 <UI.Divider clearing />
@@ -297,6 +309,16 @@ class Start extends Component {
     }
 
     getPanel2(){
+        var appData = this.props.app;
+
+        // get and set defaults
+
+        var current = appData.currentRoutes;
+        var defaultRemotePort = _.get(current, 'tunnel.remotePort');
+        var defaultRoute = _.get(current, 'proxy.routes[0].destination');
+
+        console.log("Panel 2", defaultRoute,  defaultRemotePort);
+
         return (
             <UI.Container key="panel-2">
                 <UI.Header as='h2'>
@@ -307,15 +329,15 @@ class Start extends Component {
                 <UI.Segment id="start_view_inner" loading={this.state.loading}>
                     <UI.Form>
                         <UI.Form.Group>
-                            <StartField required type="number" label="Remote Port" placeholder="Port Number" width={4} ref={(r)=>{this.forms.proxy.remotePort = this.focusable = r}} />
+                            <StartField required type="number" label="Remote Port" placeholder="Port Number" width={4} default={defaultRemotePort} ref={(r)=>{this.forms.proxy.remotePort = this.focusable = r}} />
                         </UI.Form.Group>
                         <UI.Segment>
                             <UI.Form.Group>
-                                <StartField type="input" label="App Destination" placeholder="http://localhost:3000" width={6} ref={(r)=>{this.forms.proxy.app = r}} />
+                                <StartField type="input" label="App Destination" placeholder="http://localhost:3000" width={6} default={defaultRoute} ref={(r)=>{this.forms.proxy.app = r}} />
                                 <StartField type="input" label="URL Match" placeholder="example.com" width={6} ref={(r)=>{this.forms.proxy.urlMatch = r}} />
                             </UI.Form.Group>
                         </UI.Segment>
-                        <UI.Button content="Back" />
+                        <UI.Button content="Back" onClick={this.unsetRemote.bind(this)} />
                         <UI.Button color="blue" type='submit' content="Start" onClick={this.setRoutes.bind(this)} />
                     </UI.Form>
                 </UI.Segment>
@@ -332,7 +354,7 @@ class Start extends Component {
                         Reconnect
                         <UI.Header.Subheader>Click the button below to start the tunnel</UI.Header.Subheader>
                     </UI.Header>
-                    <Shared.CurrentSetup remote={appData.currentRemote} routes={appData.currentRoutes} onBack={this.unsetRemote.bind(this)} />
+                    <Shared.CurrentSetup remote={appData.currentRemote} routes={appData.currentRoutes} button={"Change"} onBack={this.setPanel.bind(this, 2, {force2: true})} />
                     <UI.Divider />
                     <UI.Button content="Connect" color="blue" onClick={this.connect.bind(this)} />
                 </UI.Segment>
@@ -368,7 +390,7 @@ class Start extends Component {
 class StartField extends React.Component {
     constructor(props){
         super(props);
-        this.state = {value: props.value || ""};
+        this.state = {value: props.default || ""};
     }
 
     handleChange(evt, data){

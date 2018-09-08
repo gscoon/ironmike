@@ -94,8 +94,8 @@ class AppStore extends Reflux.Store
         console.log("Disconnecting...");
         Handler.api.stopTunnel();
         Handler.api.stopProxy();
-        var newApp = this.state.app.set('currentRoutes', null);
-        this.setState({app: newApp, tunnelStatus: false});
+        // var newApp = this.state.app.set('currentRoutes', null);
+        this.setState({tunnelStatus: false});
         this.persist();
     }
 

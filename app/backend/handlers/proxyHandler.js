@@ -1,12 +1,12 @@
 const Path          = require('path');
 const fs            = require('fs');
-const url           = require('url');
 const moment        = require('moment');
 const express       = require('express');
 const bodyParser    = require('body-parser');
 const _             = require('lodash');
 const getPort       = require('get-port');
-const axios         = require('axios');
+const https         = require('https');
+const URL           = require('url');
 
 var debug = Util.getDebugger('proxy');
 
@@ -14,6 +14,12 @@ module.exports = {
     start   : startProxy,
     stop    : stopProxy,
 }
+
+const axios = require('axios').create({
+    httpsAgent  : new https.Agent({
+        rejectUnauthorized  : false
+    })
+});
 
 var http;
 var routes;
@@ -53,6 +59,8 @@ function setProxy(config){
 }
 
 function processRequest(req, res, next){
+    var fullURL = getFullURL(req);
+
     storeRequest(req);
 
     if(!routes.length)
@@ -68,13 +76,21 @@ function processRequest(req, res, next){
         responseType:'stream'
     }
 
+    var appendage = req.url;
+
     routes.forEach((route)=>{
         if(!route) return;
 
-        debug("URL:", url, route.urlMatch);
-        debug("Destination:", route.destination);
+        debug("Full URL:", fullURL, route.urlMatch);
 
-        var proxyReq = axios(Object.assign(options, {url: route.destination}));
+        if(!route.urlMatch || !fullURL.startsWith(route.urlMatch))
+            return;
+
+        var destination = URL.resolve(route.destination, appendage);
+
+        debug("Destination:", destination);
+        var opts = Object.assign({url: destination}, options);
+        var proxyReq = axios(opts);
 
         if(firstMatch)
             return;
