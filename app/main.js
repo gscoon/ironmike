@@ -7,6 +7,7 @@ const fs            = require('fs');
 const moment        = require('moment');
 const getPort       = require('get-port');
 const Promise       = require('bluebird');
+const connectClient = require('electron-connect').client;
 
 const Debug         = require('debug');
 
@@ -29,11 +30,6 @@ module.exports = {
 global.Config   = require('./backend/config.js');
 global.Util     = require('./util.js');
 global.Handler  = Util.getHandlers(Path.join(__dirname, '/backend/handlers/'));
-
-require('electron-reload')(__dirname, {
-    // Note that the path to electron may vary according to the main file
-    electron: require(`${__dirname}/../node_modules/electron`)
-});
 
 var debug = Util.getDebugger('main');
 
@@ -58,6 +54,9 @@ function launchWindow(){
     });
     mainWindow.webContents.openDevTools();
     mainWindow.loadURL(`file://${__dirname}/frontend/index.html`);
+
+    if(Config.useConnect)
+        connectClient.create(mainWindow);
 }
 
 function isMaximized(){

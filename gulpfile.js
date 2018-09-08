@@ -4,9 +4,22 @@ const gulp      = require('gulp');
 const concat    = require('gulp-concat');
 const sass      = require('gulp-sass');
 
-// process.env['USE_CONNECT'] = true;
+const electron  = require('electron-connect').server.create({
+    logLevel    : 0,
+});
+
+process.env['USE_CONNECT'] = true;
 
 gulp.task('default', function () {
+    // Start browser process
+    electron.start();
+
+    // Restart browser process
+    gulp.watch(['./app/main.js', './app/backend/**/*.js', './package.json'], electron.restart);
+
+    // Reload renderer process
+    gulp.watch(['./app/frontend/**/**'], electron.reload);
+
     gulp.watch(['./app/frontend/assets/styles/sass/**'], ['css']);
 });
 

@@ -1,12 +1,12 @@
 const Path          = require('path');
 const fs            = require('fs');
 const url           = require('url');
-const rocky         = require('rocky');
 const moment        = require('moment');
 const express       = require('express');
 const bodyParser    = require('body-parser');
 const _             = require('lodash');
 const getPort       = require('get-port');
+const axios         = require('axios');
 
 var debug = Util.getDebugger('proxy');
 
@@ -16,6 +16,7 @@ module.exports = {
 }
 
 var http;
+var routes;
 
 function startProxy(config){
     return getPort()
@@ -47,48 +48,51 @@ function setProxy(config){
         debug('Proxy: Listening on port:', config.port);
     });
 
-    var proxy = rocky();
-    app.use(proxy.middleware());
-
-    var routes = config.routes;
-
-    var proxyRoute = proxy.options({
-        secure  : false, // Fixme: should be set in frontend
-    }).all('/*');
-
-    proxyRoute.use((req, res, next)=>{
-        var url = getFullURL(req);
-
-        processRequest(req);
-
-        if(!routes.length)
-            return res.send({status: true})
-
-        var isMatch = false;
-
-        routes.forEach((route)=>{
-            if(!route) return;
-
-            req.rocky.options.replays = [];
-
-            if(!route.urlMatch || url.startsWith(route.urlMatch)){
-                if(!isMatch)
-                    req.rocky.options.target = route.destination;
-                else
-                    req.rocky.options.replays.push(route.destination);
-
-                isMatch = true;
-            }
-        });
-
-        if(isMatch)
-            return next();
-
-        res.status(404).send({status: false});
-    })
+    routes = config.routes;
+    app.use(processRequest);
 }
 
-function processRequest(req){
+function processRequest(req, res, next){
+    storeRequest(req);
+
+    if(!routes.length)
+        return res.send({status: true})
+
+    var firstMatch = null;
+
+    // Request / Axios options
+    var options = {
+        headers     : req.headers,
+        method      : req.method,
+        data        : req.body,
+        responseType:'stream'
+    }
+
+    routes.forEach((route)=>{
+        if(!route) return;
+
+        debug("URL:", url, route.urlMatch);
+        debug("Destination:", route.destination);
+
+        var proxyReq = axios(Object.assign(options, {url: route.destination}));
+
+        if(firstMatch)
+            return;
+
+        firstMatch = true;
+
+        proxyReq.then((proxyResponse)=>{
+            // set response headers
+            res.set(proxyResponse.headers);
+            proxyResponse.data.pipe(res);
+        })
+    });
+
+    if(!firstMatch)
+        res.status(404).send({status: false});
+}
+
+function storeRequest(req){
     var rightNow = moment();
     var id = Util.genUID();
 

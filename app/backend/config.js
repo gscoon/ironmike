@@ -11,4 +11,5 @@ module.exports = {
         db      : Path.join(appData, 'db.json')
     },
     isDev   : process.env.NODE_ENV === 'development',
+    useConnect  : process.env.USE_CONNECT ? true : false,
 }
