@@ -13,6 +13,7 @@ var debug = Util.getDebugger('proxy');
 module.exports = {
     start   : startProxy,
     stop    : stopProxy,
+    resend  : resendRequest,
 }
 
 const axios = require('axios').create({
@@ -54,26 +55,21 @@ function setProxy(config){
         debug('Proxy: Listening on port:', config.port);
     });
 
-    routes = config.routes;
+    routes = config.routes || [];
     app.use(processRequest);
 }
 
 function processRequest(req, res, next){
     var fullURL = getFullURL(req);
 
-    storeRequest(req);
-
-    if(!routes.length)
-        return res.send({status: true})
-
-    var firstMatch = null;
+    var destinations = [];
 
     // Request / Axios options
     var options = {
         headers     : req.headers,
         method      : req.method,
         data        : req.body,
-        responseType:'stream'
+        responseType: 'stream'
     }
 
     var appendage = req.url;
@@ -83,19 +79,21 @@ function processRequest(req, res, next){
 
         debug("Full URL:", fullURL, route.urlMatch);
 
-        if(!route.urlMatch || !fullURL.startsWith(route.urlMatch))
+        if(route.urlMatch && !fullURL.startsWith(route.urlMatch))
             return;
 
         var destination = URL.resolve(route.destination, appendage);
-
         debug("Destination:", destination);
+        destinations.push(destination);
+
         var opts = Object.assign({url: destination}, options);
         var proxyReq = axios(opts);
 
-        if(firstMatch)
-            return;
+        // There can be multiple destinations
+        // Only return a response from the first destination
 
-        firstMatch = true;
+        if(destinations.length > 1)
+            return;
 
         proxyReq.then((proxyResponse)=>{
             // set response headers
@@ -104,11 +102,13 @@ function processRequest(req, res, next){
         })
     });
 
-    if(!firstMatch)
+    storeRequest(req, destinations);
+
+    if(!destinations.length)
         res.status(404).send({status: false});
 }
 
-function storeRequest(req){
+function storeRequest(req, destinations){
     var rightNow = moment();
     var id = Util.genUID();
 
@@ -120,14 +120,36 @@ function storeRequest(req){
         path            : req.url,
         timestamp       : rightNow.format(),
         unixTimestamp   : rightNow.unix(),
+        destinations    : destinations,
     });
 
     Handler.data.push('app.requests', entry);
 }
 
+function resendRequest(entry){
+    debug("Resend:");
+    debug(entry);
+
+    var options  = {
+        headers     : entry.headers,
+        method      : entry.method,
+        data        : entry.body,
+    }
+
+    var Ps = [];
+
+    entry.destinations.forEach((destination)=>{
+        var opts = Object.assign({url: destination}, options);
+        var proxyReq = axios(opts);
+        Ps.push(proxyReq);
+    })
+
+    return Promise.all(Ps);
+}
+
 function getFullURL(req, includeProtocol) {
     var proto = includeProtocol ? req.protocol : null;
-    return url.format({
+    return URL.format({
         host        : req.headers.host,
         pathname    : req.url,
         protocol    : proto,

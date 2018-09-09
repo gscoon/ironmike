@@ -66,7 +66,7 @@ class Dashboard extends Component {
                             <div className="col-sm-1">Method</div>
                             <div className="col-sm-2">Host</div>
                             <div className="col-sm-2">Path</div>
-                            <div className="col-sm-1">ID</div>
+                            <div className="col-sm-1">Resend</div>
                             <div className="col-sm-1">Delete</div>
                         </div>
                     </UI.Segment>
@@ -106,6 +106,11 @@ class RequestRow extends Component {
         if(this.interval){
             this.interval.clear();
         }
+    }
+
+    handleResend(){
+        Toast.info("Resending request...");
+        Handler.proxy.resend(this.props.request);
     }
 
     handleDelete(){
@@ -148,7 +153,9 @@ class RequestRow extends Component {
                     <div className="col-sm-1 cell">{r.method}</div>
                     <div className="col-sm-2 cell">{r.hostname}</div>
                     <div className="col-sm-2 cell">{r.path}</div>
-                    <div className="col-sm-1 cell">{id}</div>
+                    <div className="col-sm-1 cell">
+                        <UI.Button size="mini" icon="send" onClick={this.handleResend.bind(this)} />
+                    </div>
                     <div className="col-sm-1 cell">
                         <UI.Button size="mini" icon="trash" onClick={this.handleDelete.bind(this)} />
                     </div>
